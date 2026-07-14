@@ -1,0 +1,1282 @@
+{
+ "schema": "minipirineu/openmeteo/v1",
+ "fetched_at": "2026-07-14T17:45:35+00:00",
+ "timezone": "Europe/Madrid",
+ "stations": [
+  {
+   "id": "baqueira",
+   "name": "Baqueira",
+   "latitude": 42.698,
+   "longitude": 0.931,
+   "bands": [
+    {
+     "band": "baja",
+     "elevation_m": 1500,
+     "grid_elevation_m": 1500.0,
+     "models": [
+      {
+       "model": "meteofrance_arome_france_hd",
+       "label": "AROME HD 1.3 km",
+       "snowfall_source": "derived",
+       "intervals": [
+        {
+         "start": "2026-07-14T18:00",
+         "end": "2026-07-15T00:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.0,
+         "temperature_c": 27.0
+        },
+        {
+         "start": "2026-07-15T00:00",
+         "end": "2026-07-15T06:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.0,
+         "temperature_c": 20.1
+        },
+        {
+         "start": "2026-07-15T06:00",
+         "end": "2026-07-15T12:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.0,
+         "temperature_c": 22.1
+        },
+        {
+         "start": "2026-07-15T12:00",
+         "end": "2026-07-15T18:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.0,
+         "temperature_c": 29.5
+        },
+        {
+         "start": "2026-07-15T18:00",
+         "end": "2026-07-16T00:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.0,
+         "temperature_c": 24.4
+        },
+        {
+         "start": "2026-07-16T00:00",
+         "end": "2026-07-16T06:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.0,
+         "temperature_c": 19.1
+        },
+        {
+         "start": "2026-07-16T06:00",
+         "end": "2026-07-16T12:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.7,
+         "temperature_c": 20.3
+        },
+        {
+         "start": "2026-07-16T12:00",
+         "end": "2026-07-16T18:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 4.5,
+         "temperature_c": 23.4
+        }
+       ],
+       "total_snowfall_cm": 0.0,
+       "total_precipitation_mm": 5.2,
+       "effective_horizon_h": 48
+      },
+      {
+       "model": "meteofrance_arome_france",
+       "label": "AROME 2.5 km",
+       "snowfall_source": "native",
+       "intervals": [
+        {
+         "start": "2026-07-14T18:00",
+         "end": "2026-07-15T00:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.0,
+         "temperature_c": 26.6
+        },
+        {
+         "start": "2026-07-15T00:00",
+         "end": "2026-07-15T06:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.0,
+         "temperature_c": 19.6
+        },
+        {
+         "start": "2026-07-15T06:00",
+         "end": "2026-07-15T12:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.0,
+         "temperature_c": 21.5
+        },
+        {
+         "start": "2026-07-15T12:00",
+         "end": "2026-07-15T18:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.0,
+         "temperature_c": 29.1
+        },
+        {
+         "start": "2026-07-15T18:00",
+         "end": "2026-07-16T00:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.0,
+         "temperature_c": 23.8
+        },
+        {
+         "start": "2026-07-16T00:00",
+         "end": "2026-07-16T06:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.0,
+         "temperature_c": 18.3
+        },
+        {
+         "start": "2026-07-16T06:00",
+         "end": "2026-07-16T12:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.7,
+         "temperature_c": 19.7
+        },
+        {
+         "start": "2026-07-16T12:00",
+         "end": "2026-07-16T18:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 4.6,
+         "temperature_c": 23.0
+        }
+       ],
+       "total_snowfall_cm": 0.0,
+       "total_precipitation_mm": 5.3,
+       "effective_horizon_h": 48
+      }
+     ]
+    },
+    {
+     "band": "media",
+     "elevation_m": 2000,
+     "grid_elevation_m": 2000.0,
+     "models": [
+      {
+       "model": "meteofrance_arome_france_hd",
+       "label": "AROME HD 1.3 km",
+       "snowfall_source": "derived",
+       "intervals": [
+        {
+         "start": "2026-07-14T18:00",
+         "end": "2026-07-15T00:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.0,
+         "temperature_c": 22.7
+        },
+        {
+         "start": "2026-07-15T00:00",
+         "end": "2026-07-15T06:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.0,
+         "temperature_c": 16.3
+        },
+        {
+         "start": "2026-07-15T06:00",
+         "end": "2026-07-15T12:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.0,
+         "temperature_c": 18.6
+        },
+        {
+         "start": "2026-07-15T12:00",
+         "end": "2026-07-15T18:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.0,
+         "temperature_c": 25.4
+        },
+        {
+         "start": "2026-07-15T18:00",
+         "end": "2026-07-16T00:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.0,
+         "temperature_c": 20.6
+        },
+        {
+         "start": "2026-07-16T00:00",
+         "end": "2026-07-16T06:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.0,
+         "temperature_c": 15.6
+        },
+        {
+         "start": "2026-07-16T06:00",
+         "end": "2026-07-16T12:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.9,
+         "temperature_c": 17.2
+        },
+        {
+         "start": "2026-07-16T12:00",
+         "end": "2026-07-16T18:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 5.5,
+         "temperature_c": 19.8
+        }
+       ],
+       "total_snowfall_cm": 0.0,
+       "total_precipitation_mm": 6.4,
+       "effective_horizon_h": 48
+      },
+      {
+       "model": "meteofrance_arome_france",
+       "label": "AROME 2.5 km",
+       "snowfall_source": "native",
+       "intervals": [
+        {
+         "start": "2026-07-14T18:00",
+         "end": "2026-07-15T00:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.0,
+         "temperature_c": 21.4
+        },
+        {
+         "start": "2026-07-15T00:00",
+         "end": "2026-07-15T06:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.0,
+         "temperature_c": 15.2
+        },
+        {
+         "start": "2026-07-15T06:00",
+         "end": "2026-07-15T12:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.0,
+         "temperature_c": 18.2
+        },
+        {
+         "start": "2026-07-15T12:00",
+         "end": "2026-07-15T18:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.0,
+         "temperature_c": 24.5
+        },
+        {
+         "start": "2026-07-15T18:00",
+         "end": "2026-07-16T00:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.0,
+         "temperature_c": 19.5
+        },
+        {
+         "start": "2026-07-16T00:00",
+         "end": "2026-07-16T06:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.0,
+         "temperature_c": 14.1
+        },
+        {
+         "start": "2026-07-16T06:00",
+         "end": "2026-07-16T12:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 1.0,
+         "temperature_c": 17.0
+        },
+        {
+         "start": "2026-07-16T12:00",
+         "end": "2026-07-16T18:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 6.9,
+         "temperature_c": 19.0
+        }
+       ],
+       "total_snowfall_cm": 0.0,
+       "total_precipitation_mm": 7.9,
+       "effective_horizon_h": 48
+      }
+     ]
+    },
+    {
+     "band": "alta",
+     "elevation_m": 2600,
+     "grid_elevation_m": 2600.0,
+     "models": [
+      {
+       "model": "meteofrance_arome_france_hd",
+       "label": "AROME HD 1.3 km",
+       "snowfall_source": "derived",
+       "intervals": [
+        {
+         "start": "2026-07-14T18:00",
+         "end": "2026-07-15T00:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.0,
+         "temperature_c": 18.8
+        },
+        {
+         "start": "2026-07-15T00:00",
+         "end": "2026-07-15T06:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.0,
+         "temperature_c": 12.4
+        },
+        {
+         "start": "2026-07-15T06:00",
+         "end": "2026-07-15T12:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.0,
+         "temperature_c": 14.7
+        },
+        {
+         "start": "2026-07-15T12:00",
+         "end": "2026-07-15T18:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.0,
+         "temperature_c": 21.5
+        },
+        {
+         "start": "2026-07-15T18:00",
+         "end": "2026-07-16T00:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.0,
+         "temperature_c": 16.7
+        },
+        {
+         "start": "2026-07-16T00:00",
+         "end": "2026-07-16T06:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.0,
+         "temperature_c": 11.7
+        },
+        {
+         "start": "2026-07-16T06:00",
+         "end": "2026-07-16T12:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.9,
+         "temperature_c": 13.3
+        },
+        {
+         "start": "2026-07-16T12:00",
+         "end": "2026-07-16T18:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 5.5,
+         "temperature_c": 15.9
+        }
+       ],
+       "total_snowfall_cm": 0.0,
+       "total_precipitation_mm": 6.4,
+       "effective_horizon_h": 48
+      },
+      {
+       "model": "meteofrance_arome_france",
+       "label": "AROME 2.5 km",
+       "snowfall_source": "native",
+       "intervals": [
+        {
+         "start": "2026-07-14T18:00",
+         "end": "2026-07-15T00:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.0,
+         "temperature_c": 17.5
+        },
+        {
+         "start": "2026-07-15T00:00",
+         "end": "2026-07-15T06:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.0,
+         "temperature_c": 11.2
+        },
+        {
+         "start": "2026-07-15T06:00",
+         "end": "2026-07-15T12:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.0,
+         "temperature_c": 14.3
+        },
+        {
+         "start": "2026-07-15T12:00",
+         "end": "2026-07-15T18:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.0,
+         "temperature_c": 20.6
+        },
+        {
+         "start": "2026-07-15T18:00",
+         "end": "2026-07-16T00:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.0,
+         "temperature_c": 15.6
+        },
+        {
+         "start": "2026-07-16T00:00",
+         "end": "2026-07-16T06:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.0,
+         "temperature_c": 10.2
+        },
+        {
+         "start": "2026-07-16T06:00",
+         "end": "2026-07-16T12:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 1.0,
+         "temperature_c": 13.1
+        },
+        {
+         "start": "2026-07-16T12:00",
+         "end": "2026-07-16T18:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 6.9,
+         "temperature_c": 15.1
+        }
+       ],
+       "total_snowfall_cm": 0.0,
+       "total_precipitation_mm": 7.9,
+       "effective_horizon_h": 48
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "boi-taull",
+   "name": "Boí Taüll",
+   "latitude": 42.47,
+   "longitude": 0.885,
+   "bands": [
+    {
+     "band": "baja",
+     "elevation_m": 2000,
+     "grid_elevation_m": 2000.0,
+     "models": [
+      {
+       "model": "meteofrance_arome_france_hd",
+       "label": "AROME HD 1.3 km",
+       "snowfall_source": "derived",
+       "intervals": [
+        {
+         "start": "2026-07-14T18:00",
+         "end": "2026-07-15T00:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.0,
+         "temperature_c": 20.9
+        },
+        {
+         "start": "2026-07-15T00:00",
+         "end": "2026-07-15T06:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.0,
+         "temperature_c": 14.8
+        },
+        {
+         "start": "2026-07-15T06:00",
+         "end": "2026-07-15T12:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.0,
+         "temperature_c": 17.2
+        },
+        {
+         "start": "2026-07-15T12:00",
+         "end": "2026-07-15T18:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.0,
+         "temperature_c": 23.2
+        },
+        {
+         "start": "2026-07-15T18:00",
+         "end": "2026-07-16T00:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.0,
+         "temperature_c": 20.8
+        },
+        {
+         "start": "2026-07-16T00:00",
+         "end": "2026-07-16T06:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.0,
+         "temperature_c": 15.4
+        },
+        {
+         "start": "2026-07-16T06:00",
+         "end": "2026-07-16T12:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.3,
+         "temperature_c": 17.1
+        },
+        {
+         "start": "2026-07-16T12:00",
+         "end": "2026-07-16T18:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 3.6,
+         "temperature_c": 19.6
+        }
+       ],
+       "total_snowfall_cm": 0.0,
+       "total_precipitation_mm": 3.9,
+       "effective_horizon_h": 48
+      },
+      {
+       "model": "meteofrance_arome_france",
+       "label": "AROME 2.5 km",
+       "snowfall_source": "native",
+       "intervals": [
+        {
+         "start": "2026-07-14T18:00",
+         "end": "2026-07-15T00:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.0,
+         "temperature_c": 22.7
+        },
+        {
+         "start": "2026-07-15T00:00",
+         "end": "2026-07-15T06:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.0,
+         "temperature_c": 16.7
+        },
+        {
+         "start": "2026-07-15T06:00",
+         "end": "2026-07-15T12:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.0,
+         "temperature_c": 18.0
+        },
+        {
+         "start": "2026-07-15T12:00",
+         "end": "2026-07-15T18:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.0,
+         "temperature_c": 24.6
+        },
+        {
+         "start": "2026-07-15T18:00",
+         "end": "2026-07-16T00:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.0,
+         "temperature_c": 22.8
+        },
+        {
+         "start": "2026-07-16T00:00",
+         "end": "2026-07-16T06:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.0,
+         "temperature_c": 17.6
+        },
+        {
+         "start": "2026-07-16T06:00",
+         "end": "2026-07-16T12:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.3,
+         "temperature_c": 18.1
+        },
+        {
+         "start": "2026-07-16T12:00",
+         "end": "2026-07-16T18:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 1.2,
+         "temperature_c": 20.6
+        }
+       ],
+       "total_snowfall_cm": 0.0,
+       "total_precipitation_mm": 1.5,
+       "effective_horizon_h": 48
+      }
+     ]
+    },
+    {
+     "band": "media",
+     "elevation_m": 2400,
+     "grid_elevation_m": 2400.0,
+     "models": [
+      {
+       "model": "meteofrance_arome_france_hd",
+       "label": "AROME HD 1.3 km",
+       "snowfall_source": "derived",
+       "intervals": [
+        {
+         "start": "2026-07-14T18:00",
+         "end": "2026-07-15T00:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.0,
+         "temperature_c": 18.9
+        },
+        {
+         "start": "2026-07-15T00:00",
+         "end": "2026-07-15T06:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.0,
+         "temperature_c": 13.0
+        },
+        {
+         "start": "2026-07-15T06:00",
+         "end": "2026-07-15T12:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.0,
+         "temperature_c": 15.0
+        },
+        {
+         "start": "2026-07-15T12:00",
+         "end": "2026-07-15T18:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.0,
+         "temperature_c": 20.7
+        },
+        {
+         "start": "2026-07-15T18:00",
+         "end": "2026-07-16T00:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.0,
+         "temperature_c": 18.9
+        },
+        {
+         "start": "2026-07-16T00:00",
+         "end": "2026-07-16T06:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.0,
+         "temperature_c": 13.8
+        },
+        {
+         "start": "2026-07-16T06:00",
+         "end": "2026-07-16T12:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.3,
+         "temperature_c": 14.8
+        },
+        {
+         "start": "2026-07-16T12:00",
+         "end": "2026-07-16T18:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 3.0,
+         "temperature_c": 16.8
+        }
+       ],
+       "total_snowfall_cm": 0.0,
+       "total_precipitation_mm": 3.3,
+       "effective_horizon_h": 48
+      },
+      {
+       "model": "meteofrance_arome_france",
+       "label": "AROME 2.5 km",
+       "snowfall_source": "native",
+       "intervals": [
+        {
+         "start": "2026-07-14T18:00",
+         "end": "2026-07-15T00:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.0,
+         "temperature_c": 20.1
+        },
+        {
+         "start": "2026-07-15T00:00",
+         "end": "2026-07-15T06:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.0,
+         "temperature_c": 14.5
+        },
+        {
+         "start": "2026-07-15T06:00",
+         "end": "2026-07-15T12:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.0,
+         "temperature_c": 15.0
+        },
+        {
+         "start": "2026-07-15T12:00",
+         "end": "2026-07-15T18:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.0,
+         "temperature_c": 21.3
+        },
+        {
+         "start": "2026-07-15T18:00",
+         "end": "2026-07-16T00:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.0,
+         "temperature_c": 20.1
+        },
+        {
+         "start": "2026-07-16T00:00",
+         "end": "2026-07-16T06:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.0,
+         "temperature_c": 15.1
+        },
+        {
+         "start": "2026-07-16T06:00",
+         "end": "2026-07-16T12:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.3,
+         "temperature_c": 15.0
+        },
+        {
+         "start": "2026-07-16T12:00",
+         "end": "2026-07-16T18:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 1.7,
+         "temperature_c": 17.5
+        }
+       ],
+       "total_snowfall_cm": 0.0,
+       "total_precipitation_mm": 2.0,
+       "effective_horizon_h": 48
+      }
+     ]
+    },
+    {
+     "band": "alta",
+     "elevation_m": 2750,
+     "grid_elevation_m": 2750.0,
+     "models": [
+      {
+       "model": "meteofrance_arome_france_hd",
+       "label": "AROME HD 1.3 km",
+       "snowfall_source": "derived",
+       "intervals": [
+        {
+         "start": "2026-07-14T18:00",
+         "end": "2026-07-15T00:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.0,
+         "temperature_c": 16.1
+        },
+        {
+         "start": "2026-07-15T00:00",
+         "end": "2026-07-15T06:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.0,
+         "temperature_c": 10.9
+        },
+        {
+         "start": "2026-07-15T06:00",
+         "end": "2026-07-15T12:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.0,
+         "temperature_c": 12.6
+        },
+        {
+         "start": "2026-07-15T12:00",
+         "end": "2026-07-15T18:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.0,
+         "temperature_c": 18.2
+        },
+        {
+         "start": "2026-07-15T18:00",
+         "end": "2026-07-16T00:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.0,
+         "temperature_c": 16.0
+        },
+        {
+         "start": "2026-07-16T00:00",
+         "end": "2026-07-16T06:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.0,
+         "temperature_c": 11.3
+        },
+        {
+         "start": "2026-07-16T06:00",
+         "end": "2026-07-16T12:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.3,
+         "temperature_c": 12.3
+        },
+        {
+         "start": "2026-07-16T12:00",
+         "end": "2026-07-16T18:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 2.5,
+         "temperature_c": 14.5
+        }
+       ],
+       "total_snowfall_cm": 0.0,
+       "total_precipitation_mm": 2.8,
+       "effective_horizon_h": 48
+      },
+      {
+       "model": "meteofrance_arome_france",
+       "label": "AROME 2.5 km",
+       "snowfall_source": "native",
+       "intervals": [
+        {
+         "start": "2026-07-14T18:00",
+         "end": "2026-07-15T00:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.0,
+         "temperature_c": 16.2
+        },
+        {
+         "start": "2026-07-15T00:00",
+         "end": "2026-07-15T06:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.0,
+         "temperature_c": 11.3
+        },
+        {
+         "start": "2026-07-15T06:00",
+         "end": "2026-07-15T12:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.0,
+         "temperature_c": 12.5
+        },
+        {
+         "start": "2026-07-15T12:00",
+         "end": "2026-07-15T18:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.0,
+         "temperature_c": 17.9
+        },
+        {
+         "start": "2026-07-15T18:00",
+         "end": "2026-07-16T00:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.0,
+         "temperature_c": 16.0
+        },
+        {
+         "start": "2026-07-16T00:00",
+         "end": "2026-07-16T06:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.0,
+         "temperature_c": 11.6
+        },
+        {
+         "start": "2026-07-16T06:00",
+         "end": "2026-07-16T12:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.4,
+         "temperature_c": 12.4
+        },
+        {
+         "start": "2026-07-16T12:00",
+         "end": "2026-07-16T18:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 2.4,
+         "temperature_c": 14.2
+        }
+       ],
+       "total_snowfall_cm": 0.0,
+       "total_precipitation_mm": 2.8,
+       "effective_horizon_h": 48
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "la-molina",
+   "name": "La Molina",
+   "latitude": 42.337,
+   "longitude": 1.948,
+   "bands": [
+    {
+     "band": "baja",
+     "elevation_m": 1700,
+     "grid_elevation_m": 1700.0,
+     "models": [
+      {
+       "model": "meteofrance_arome_france_hd",
+       "label": "AROME HD 1.3 km",
+       "snowfall_source": "derived",
+       "intervals": [
+        {
+         "start": "2026-07-14T18:00",
+         "end": "2026-07-15T00:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.0,
+         "temperature_c": 24.3
+        },
+        {
+         "start": "2026-07-15T00:00",
+         "end": "2026-07-15T06:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.0,
+         "temperature_c": 19.0
+        },
+        {
+         "start": "2026-07-15T06:00",
+         "end": "2026-07-15T12:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.0,
+         "temperature_c": 21.7
+        },
+        {
+         "start": "2026-07-15T12:00",
+         "end": "2026-07-15T18:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.0,
+         "temperature_c": 28.3
+        },
+        {
+         "start": "2026-07-15T18:00",
+         "end": "2026-07-16T00:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.0,
+         "temperature_c": 25.1
+        },
+        {
+         "start": "2026-07-16T00:00",
+         "end": "2026-07-16T06:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.0,
+         "temperature_c": 19.8
+        },
+        {
+         "start": "2026-07-16T06:00",
+         "end": "2026-07-16T12:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.0,
+         "temperature_c": 21.1
+        },
+        {
+         "start": "2026-07-16T12:00",
+         "end": "2026-07-16T18:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.5,
+         "temperature_c": 26.0
+        }
+       ],
+       "total_snowfall_cm": 0.0,
+       "total_precipitation_mm": 0.5,
+       "effective_horizon_h": 48
+      },
+      {
+       "model": "meteofrance_arome_france",
+       "label": "AROME 2.5 km",
+       "snowfall_source": "native",
+       "intervals": [
+        {
+         "start": "2026-07-14T18:00",
+         "end": "2026-07-15T00:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.0,
+         "temperature_c": 24.4
+        },
+        {
+         "start": "2026-07-15T00:00",
+         "end": "2026-07-15T06:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.0,
+         "temperature_c": 19.3
+        },
+        {
+         "start": "2026-07-15T06:00",
+         "end": "2026-07-15T12:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.0,
+         "temperature_c": 21.0
+        },
+        {
+         "start": "2026-07-15T12:00",
+         "end": "2026-07-15T18:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.0,
+         "temperature_c": 28.0
+        },
+        {
+         "start": "2026-07-15T18:00",
+         "end": "2026-07-16T00:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.0,
+         "temperature_c": 25.3
+        },
+        {
+         "start": "2026-07-16T00:00",
+         "end": "2026-07-16T06:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.0,
+         "temperature_c": 20.3
+        },
+        {
+         "start": "2026-07-16T06:00",
+         "end": "2026-07-16T12:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.0,
+         "temperature_c": 20.6
+        },
+        {
+         "start": "2026-07-16T12:00",
+         "end": "2026-07-16T18:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.4,
+         "temperature_c": 25.9
+        }
+       ],
+       "total_snowfall_cm": 0.0,
+       "total_precipitation_mm": 0.4,
+       "effective_horizon_h": 48
+      }
+     ]
+    },
+    {
+     "band": "media",
+     "elevation_m": 2100,
+     "grid_elevation_m": 2100.0,
+     "models": [
+      {
+       "model": "meteofrance_arome_france_hd",
+       "label": "AROME HD 1.3 km",
+       "snowfall_source": "derived",
+       "intervals": [
+        {
+         "start": "2026-07-14T18:00",
+         "end": "2026-07-15T00:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.0,
+         "temperature_c": 21.8
+        },
+        {
+         "start": "2026-07-15T00:00",
+         "end": "2026-07-15T06:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.0,
+         "temperature_c": 16.7
+        },
+        {
+         "start": "2026-07-15T06:00",
+         "end": "2026-07-15T12:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.0,
+         "temperature_c": 19.0
+        },
+        {
+         "start": "2026-07-15T12:00",
+         "end": "2026-07-15T18:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.0,
+         "temperature_c": 25.6
+        },
+        {
+         "start": "2026-07-15T18:00",
+         "end": "2026-07-16T00:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.0,
+         "temperature_c": 22.5
+        },
+        {
+         "start": "2026-07-16T00:00",
+         "end": "2026-07-16T06:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.0,
+         "temperature_c": 17.5
+        },
+        {
+         "start": "2026-07-16T06:00",
+         "end": "2026-07-16T12:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.0,
+         "temperature_c": 18.3
+        },
+        {
+         "start": "2026-07-16T12:00",
+         "end": "2026-07-16T18:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.5,
+         "temperature_c": 23.4
+        }
+       ],
+       "total_snowfall_cm": 0.0,
+       "total_precipitation_mm": 0.5,
+       "effective_horizon_h": 48
+      },
+      {
+       "model": "meteofrance_arome_france",
+       "label": "AROME 2.5 km",
+       "snowfall_source": "native",
+       "intervals": [
+        {
+         "start": "2026-07-14T18:00",
+         "end": "2026-07-15T00:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.0,
+         "temperature_c": 19.9
+        },
+        {
+         "start": "2026-07-15T00:00",
+         "end": "2026-07-15T06:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.0,
+         "temperature_c": 15.6
+        },
+        {
+         "start": "2026-07-15T06:00",
+         "end": "2026-07-15T12:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.0,
+         "temperature_c": 19.2
+        },
+        {
+         "start": "2026-07-15T12:00",
+         "end": "2026-07-15T18:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.0,
+         "temperature_c": 24.9
+        },
+        {
+         "start": "2026-07-15T18:00",
+         "end": "2026-07-16T00:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.0,
+         "temperature_c": 21.4
+        },
+        {
+         "start": "2026-07-16T00:00",
+         "end": "2026-07-16T06:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.0,
+         "temperature_c": 17.4
+        },
+        {
+         "start": "2026-07-16T06:00",
+         "end": "2026-07-16T12:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.0,
+         "temperature_c": 17.6
+        },
+        {
+         "start": "2026-07-16T12:00",
+         "end": "2026-07-16T18:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.4,
+         "temperature_c": 22.4
+        }
+       ],
+       "total_snowfall_cm": 0.0,
+       "total_precipitation_mm": 0.4,
+       "effective_horizon_h": 48
+      }
+     ]
+    },
+    {
+     "band": "alta",
+     "elevation_m": 2500,
+     "grid_elevation_m": 2500.0,
+     "models": [
+      {
+       "model": "meteofrance_arome_france_hd",
+       "label": "AROME HD 1.3 km",
+       "snowfall_source": "derived",
+       "intervals": [
+        {
+         "start": "2026-07-14T18:00",
+         "end": "2026-07-15T00:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.0,
+         "temperature_c": 19.2
+        },
+        {
+         "start": "2026-07-15T00:00",
+         "end": "2026-07-15T06:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.0,
+         "temperature_c": 14.1
+        },
+        {
+         "start": "2026-07-15T06:00",
+         "end": "2026-07-15T12:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.0,
+         "temperature_c": 16.4
+        },
+        {
+         "start": "2026-07-15T12:00",
+         "end": "2026-07-15T18:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.0,
+         "temperature_c": 23.0
+        },
+        {
+         "start": "2026-07-15T18:00",
+         "end": "2026-07-16T00:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.0,
+         "temperature_c": 19.9
+        },
+        {
+         "start": "2026-07-16T00:00",
+         "end": "2026-07-16T06:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.0,
+         "temperature_c": 14.9
+        },
+        {
+         "start": "2026-07-16T06:00",
+         "end": "2026-07-16T12:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.0,
+         "temperature_c": 15.7
+        },
+        {
+         "start": "2026-07-16T12:00",
+         "end": "2026-07-16T18:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.5,
+         "temperature_c": 20.8
+        }
+       ],
+       "total_snowfall_cm": 0.0,
+       "total_precipitation_mm": 0.5,
+       "effective_horizon_h": 48
+      },
+      {
+       "model": "meteofrance_arome_france",
+       "label": "AROME 2.5 km",
+       "snowfall_source": "native",
+       "intervals": [
+        {
+         "start": "2026-07-14T18:00",
+         "end": "2026-07-15T00:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.0,
+         "temperature_c": 17.2
+        },
+        {
+         "start": "2026-07-15T00:00",
+         "end": "2026-07-15T06:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.0,
+         "temperature_c": 12.6
+        },
+        {
+         "start": "2026-07-15T06:00",
+         "end": "2026-07-15T12:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.0,
+         "temperature_c": 15.8
+        },
+        {
+         "start": "2026-07-15T12:00",
+         "end": "2026-07-15T18:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.0,
+         "temperature_c": 21.6
+        },
+        {
+         "start": "2026-07-15T18:00",
+         "end": "2026-07-16T00:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.0,
+         "temperature_c": 18.5
+        },
+        {
+         "start": "2026-07-16T00:00",
+         "end": "2026-07-16T06:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.0,
+         "temperature_c": 14.0
+        },
+        {
+         "start": "2026-07-16T06:00",
+         "end": "2026-07-16T12:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.0,
+         "temperature_c": 14.5
+        },
+        {
+         "start": "2026-07-16T12:00",
+         "end": "2026-07-16T18:00",
+         "snowfall_cm": 0.0,
+         "precipitation_mm": 0.7,
+         "temperature_c": 19.8
+        }
+       ],
+       "total_snowfall_cm": 0.0,
+       "total_precipitation_mm": 0.7,
+       "effective_horizon_h": 48
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}
