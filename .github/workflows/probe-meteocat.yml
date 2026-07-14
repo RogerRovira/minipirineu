@@ -1,0 +1,26 @@
+# One-off manual probe to record real Meteocat responses as test fixtures
+# without exposing the API key locally. Each dispatch costs 2 quota calls.
+name: probe-meteocat
+
+on:
+  workflow_dispatch:
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch pirineu forecast for today and tomorrow
+        env:
+          METEOCAT_API_KEY: ${{ secrets.METEOCAT_API_KEY }}
+        run: |
+          for day in 0 1; do
+            date=$(date -u -d "+${day} day" +%Y/%m/%d)
+            code=$(curl -s -o "pirineu-$day.json" -w "%{http_code}" \
+              -H "X-Api-Key: $METEOCAT_API_KEY" \
+              "https://api.meteo.cat/pronostic/v1/pirineu/$date")
+            echo "day+$day ($date): HTTP $code, $(wc -c < pirineu-$day.json) bytes"
+          done
+      - uses: actions/upload-artifact@v4
+        with:
+          name: meteocat-probe
+          path: pirineu-*.json
