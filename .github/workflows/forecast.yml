@@ -1,0 +1,70 @@
+# Main cron: refresh Open-Meteo data every ~6h, rebuild and deploy the site.
+# Meteocat is ingested by its own decoupled workflow (meteocat.yml) — never
+# add Meteocat calls here (100 calls/month quota, see the brief).
+name: forecast
+
+on:
+  schedule:
+    - cron: "17 */6 * * *" # off-the-hour to dodge GitHub's scheduled-run congestion
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+# Serialize with meteocat.yml: both commit data/ and deploy Pages.
+concurrency:
+  group: publish
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -e .
+
+      # A failed ingest must not block publishing: the site is rebuilt with
+      # the last-good JSON, whose old timestamp shows up as stale.
+      - name: Ingest Open-Meteo
+        id: ingest
+        continue-on-error: true
+        run: python -m minipirineu.ingest_openmeteo
+
+      - name: Commit refreshed data
+        if: steps.ingest.outcome == 'success'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/openmeteo.json
+          git diff --cached --quiet || {
+            git commit -m "data: openmeteo refresh"
+            git pull --rebase origin main
+            git push
+          }
+
+      - name: Render site
+        run: python -m minipirineu.render
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+      # Deploy succeeded with old data, but the run must show red so the
+      # failure is noticed (GitHub emails on workflow failure).
+      - name: Fail the run if ingest failed
+        if: steps.ingest.outcome == 'failure'
+        run: |
+          echo "::error::Open-Meteo ingest failed; site was deployed with last-good data"
+          exit 1

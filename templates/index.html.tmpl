@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MiniPiriNeu — nieve a 48h por cota</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <h1>MiniPiriNeu</h1>
+  <p class="subtitle">Nieve prevista a 48h por cota · AROME HD 1.3 km y AROME 2.5 km (Météo-France vía Open-Meteo)</p>
+  <div class="sources">
+$sources_html
+  </div>
+</header>
+<main>
+$stations_html
+$meteocat_html
+</main>
+<footer>
+  <p>* AROME HD no publica nieve: cm estimados a partir de su precipitación y la temperatura en la cota
+     (ratio ajustado contra AROME 2.5; ver repositorio). T = temperatura prevista en la cota (AROME 2.5).</p>
+  <p>Página generada el $generated_label. Los datos se regeneran cada ~6h; si una fuente aparece en rojo, está caducada.</p>
+</footer>
+<script>
+(function () {
+  var now = Date.now();
+  document.querySelectorAll("[data-fetched-at]").forEach(function (el) {
+    var fetched = Date.parse(el.getAttribute("data-fetched-at"));
+    if (isNaN(fetched)) return;
+    var hours = (now - fetched) / 3600000;
+    var staleAfter = parseFloat(el.getAttribute("data-stale-after-h"));
+    el.classList.remove("fresh", "stale");
+    el.classList.add(hours > staleAfter ? "stale" : "fresh");
+    var span = el.querySelector(".age");
+    if (span) span.textContent = hours < 1 ? "hace " + Math.round(hours * 60) + " min" : "hace " + Math.round(hours) + " h";
+  });
+})();
+</script>
+</body>
+</html>
