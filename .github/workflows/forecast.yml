@@ -31,12 +31,22 @@ jobs:
           python-version: "3.12"
       - run: pip install -e .
 
+      - uses: ./.github/actions/datastore-checkout
+
       # A failed ingest must not block publishing: the site is rebuilt with
       # the last-good JSON, whose old timestamp shows up as stale.
       - name: Ingest Open-Meteo
         id: ingest
         continue-on-error: true
+        env:
+          MINIPIRINEU_DATA_DIR: datastore
         run: python -m minipirineu.ingest_openmeteo
+
+      # Archive-before-parse: raw responses may exist even when the ingest
+      # failed later — commit them regardless of the step outcome.
+      - uses: ./.github/actions/datastore-commit
+        with:
+          message: "openmeteo: wide raw responses + freezing-level diagnostics"
 
       - name: Commit refreshed data
         if: steps.ingest.outcome == 'success'

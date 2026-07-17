@@ -12,15 +12,23 @@ BAQUEIRA = STATIONS[0]
 
 def test_build_params_is_explicit_and_complete():
     params = openmeteo.build_params(BAQUEIRA, 2000)
+    hourly = params.pop("hourly").split(",")
     assert params == {
         "latitude": 42.698,
         "longitude": 0.931,
         "elevation": 2000,
         "models": "meteofrance_arome_france_hd,meteofrance_arome_france",
-        "hourly": "snowfall,precipitation,temperature_2m",
         "timezone": "Europe/Madrid",
         "forecast_days": 3,
     }
+    # rendered trio first (T4 must not change the page), then the wide vars
+    assert hourly[:3] == ["snowfall", "precipitation", "temperature_2m"]
+    for var in ("relative_humidity_2m", "wind_speed_10m", "wind_gusts_10m"):
+        assert var in hourly
+    for level in (1000, 925, 850, 700, 600, 500):
+        for kind in ("temperature", "relative_humidity", "geopotential_height"):
+            assert f"{kind}_{level}hPa" in hourly
+    assert len(hourly) == len(set(hourly)) == 24
 
 
 def test_best_match_never_appears():
@@ -57,6 +65,37 @@ def test_parse_recorded_response():
 
     # elevation echo confirms Open-Meteo applied the requested downscaling height
     assert parsed["grid_elevation_m"] == 2000
+
+
+def wide_fixture() -> dict:
+    return json.loads((FIXTURES / "openmeteo_wide_baqueira_1500.json").read_text())
+
+
+def test_wide_response_parses_identically_for_rendered_vars():
+    # the verification gate: widening the request must not change the page.
+    # Recorded live 2026-07-17 with the full T4 variable set.
+    wide = wide_fixture()
+    narrow = {**wide, "hourly": {
+        k: v for k, v in wide["hourly"].items()
+        if not ("hPa" in k or "wind_" in k or "relative_humidity_2m" in k)
+    }}
+    assert openmeteo.parse_response(wide) == openmeteo.parse_response(narrow)
+
+
+def test_pressure_profiles_serve_arome25_only():
+    wide = wide_fixture()
+    profiles = openmeteo.pressure_profiles(wide, "meteofrance_arome_france")
+    assert len(profiles) == len(wide["hourly"]["time"])
+    temps, heights = profiles[0]
+    assert len(temps) == 6 and len(heights) == 6
+    assert any(t is not None for t in temps)
+    # heights ordered ground -> up wherever present
+    real_heights = [h for h in heights if h is not None]
+    assert real_heights == sorted(real_heights)
+    # AROME HD serves no pressure levels (validated M1 and re-validated on
+    # this fixture): all None, never fabricated
+    hd = openmeteo.pressure_profiles(wide, "meteofrance_arome_france_hd")
+    assert all(t is None for temps, _ in hd for t in temps)
 
 
 def test_parse_rejects_length_mismatch():

@@ -4,6 +4,12 @@ Failure contract (feature 4 of the brief): any error — network, schema
 surprise, validation — leaves the previous JSON untouched and exits
 non-zero, so stale data stays visibly stale instead of being replaced by
 garbage or half-written files.
+
+T4 (archive wide, publish narrow): each raw response is archived to the
+datastore BEFORE parsing (ADR-0002 — pressure-level coverage in the Previous
+Runs API is unconfirmed, self-archiving is the only guaranteed history), and
+the freezing-level diagnostic goes to the verification store. The rendered
+JSON does not change (verification gate).
 """
 
 import json
@@ -12,17 +18,32 @@ import sys
 import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
+from typing import NamedTuple
 from zoneinfo import ZoneInfo
 
 import requests
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 
-from minipirineu import aggregate, openmeteo
+from minipirineu import aggregate, openmeteo, store
+from minipirineu.archive import Archive
 from minipirineu.config import MODELS, STATIONS, TIMEZONE
+from minipirineu.freezing_level import freezing_rows
 
 SCHEMA = "minipirineu/openmeteo/v1"
 DEFAULT_OUT = Path("data/openmeteo.json")
+
+
+class Sink(NamedTuple):
+    """Where the wide ingest lands: raw archive + verification store."""
+
+    archive: Archive
+    conn: object  # sqlite3.Connection
+    fetched_at: datetime
+
+    @property
+    def run_time_utc(self) -> str:
+        return self.fetched_at.strftime("%Y-%m-%dT%H:%M:%SZ")
 
 MAX_SNOWFALL_CM_6H = 200
 MAX_PRECIPITATION_MM_6H = 300
@@ -49,12 +70,27 @@ def snowfall_series(spec, series: dict) -> list:
     return aggregate.derive_snowfall(series["precipitation_mm"], series["temperature_c"])
 
 
-def build_snapshot(session: requests.Session, now_local: datetime) -> dict:
+def _fetch_band(session, station, elevation_m: int, sink: Sink | None) -> dict:
+    """Fetch one station/band, archiving the raw bytes before any parsing."""
+    raw_bytes = openmeteo.fetch(session, station, elevation_m)
+    if sink is not None:
+        sink.archive.store("openmeteo", f"{station.id}_{elevation_m}.json",
+                           raw_bytes, fetched_at=sink.fetched_at)
+    return json.loads(raw_bytes)
+
+
+def build_snapshot(session: requests.Session, now_local: datetime,
+                   sink: Sink | None = None) -> dict:
     stations_out = []
     for station in STATIONS:
         bands_out = []
         for band, elevation_m in station.bands:
-            raw = openmeteo.fetch(session, station, elevation_m)
+            raw = _fetch_band(session, station, elevation_m, sink)
+            if sink is not None and elevation_m == station.bands[0][1]:
+                # pressure profiles are per grid column, not per band: one
+                # freezing-level series per station is enough
+                store.upsert_rows(sink.conn,
+                                  freezing_rows(station.id, raw, sink.run_time_utc))
             parsed = openmeteo.parse_response(raw)
             models_out = []
             for spec in MODELS:
@@ -144,11 +180,14 @@ def atomic_write_json(path: Path, obj: dict) -> None:
         raise
 
 
-def main(out_path: Path = DEFAULT_OUT) -> int:
-    now_local = datetime.now(ZoneInfo(TIMEZONE)).replace(tzinfo=None)
+def main(out_path: Path = DEFAULT_OUT, now_local: datetime | None = None) -> int:
+    now_local = now_local or datetime.now(ZoneInfo(TIMEZONE)).replace(tzinfo=None)
     try:
+        archive = Archive.from_env()
+        sink = Sink(archive, store.connect(archive.root / "verification.sqlite"),
+                    datetime.now(timezone.utc))
         with make_session() as session:
-            snapshot = build_snapshot(session, now_local)
+            snapshot = build_snapshot(session, now_local, sink)
         validate(snapshot)
     except Exception as exc:
         print(f"openmeteo ingest FAILED, keeping previous {out_path}: {exc}", file=sys.stderr)

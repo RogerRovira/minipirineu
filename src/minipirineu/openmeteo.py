@@ -16,7 +16,17 @@ import requests
 from minipirineu.config import MODELS, TIMEZONE
 
 API_URL = "https://api.open-meteo.com/v1/forecast"
+# The rendered trio — everything the page consumes, and nothing else.
 HOURLY_VARS = ("snowfall", "precipitation", "temperature_2m")
+# Wide vars (T4, "archive wide publish narrow"): fetched and archived raw for
+# Stage 1–2 (wet-bulb partition, undercatch, lagged blends) but NOT rendered.
+SURFACE_WIDE_VARS = ("relative_humidity_2m", "wind_speed_10m", "wind_gusts_10m")
+PRESSURE_LEVELS = (1000, 925, 850, 700, 600, 500)  # hPa, ordered ground -> up
+_PRESSURE_KINDS = ("temperature", "relative_humidity", "geopotential_height")
+PRESSURE_WIDE_VARS = tuple(
+    f"{kind}_{level}hPa" for level in PRESSURE_LEVELS for kind in _PRESSURE_KINDS
+)
+ALL_HOURLY_VARS = HOURLY_VARS + SURFACE_WIDE_VARS + PRESSURE_WIDE_VARS
 MODEL_IDS = tuple(spec.id for spec in MODELS)
 
 
@@ -32,17 +42,19 @@ def build_params(station, elevation_m: int) -> dict:
         "longitude": station.longitude,
         "elevation": elevation_m,
         "models": ",".join(MODEL_IDS),
-        "hourly": ",".join(HOURLY_VARS),
+        "hourly": ",".join(ALL_HOURLY_VARS),
         "timezone": TIMEZONE,
         # 3 local days always cover now+48h regardless of the run hour
         "forecast_days": 3,
     }
 
 
-def fetch(session: requests.Session, station, elevation_m: int, timeout: int = 30) -> dict:
+def fetch(session: requests.Session, station, elevation_m: int, timeout: int = 30) -> bytes:
+    """Raw response BYTES: the caller archives them byte-faithful (ADR-0002)
+    before any json.loads — a parser bug must never lose the payload."""
     resp = session.get(API_URL, params=build_params(station, elevation_m), timeout=timeout)
     resp.raise_for_status()
-    return resp.json()
+    return resp.content
 
 
 def parse_response(raw: dict) -> dict:
@@ -74,3 +86,19 @@ def parse_response(raw: dict) -> dict:
         "grid_elevation_m": raw.get("elevation"),
         "models": models,
     }
+
+
+def pressure_profiles(raw: dict, model_id: str) -> list[tuple[list, list]]:
+    """Per-hour (temps, heights) along PRESSURE_LEVELS, ground -> up.
+
+    Lenient by design: a model without pressure levels (AROME HD — key
+    present but all null, validated on the live API) or a missing key yields
+    all-None profiles, which derive_freezing_level treats as no data.
+    """
+    hourly = raw["hourly"]
+    n = len(hourly["time"])
+    temps = [hourly.get(f"temperature_{level}hPa_{model_id}") or [None] * n
+             for level in PRESSURE_LEVELS]
+    heights = [hourly.get(f"geopotential_height_{level}hPa_{model_id}") or [None] * n
+               for level in PRESSURE_LEVELS]
+    return [([t[i] for t in temps], [h[i] for h in heights]) for i in range(n)]
