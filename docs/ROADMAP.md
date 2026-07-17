@@ -265,6 +265,14 @@ S0.9 under the ingest-wide decision of 2026-07-17; Stage 1 is what those data en
 | S2.6 Obs-anchored first buckets | replace elapsed part of current bucket with observed XEMA accumulation (needs S0.8 live obs) | M | first-bucket MAE strictly better on 1 month live; never touches later buckets |
 | S2.7 Ensemble spread → probabilities | Open-Meteo Ensemble API (calls ×4): P(≥X cm), snow-line range; AROME stays the central estimate | M | Brier skill > 0 vs climatology on backtest/live before rendering |
 
+**S2.3 status (2026-07-18)**: columns implemented behind `?modelos=todos` —
+KNMI/DMI HARMONIE plus `ecmwf_ifs` (probed: the 9 km HRES grid, not
+`ecmwf_ifs025`). Separate request per band; they degrade to an explicit
+"unavailable" (— cells, never a fake 0) and can never fail the AROME ingest.
+The go/no-go (scored winter month, MAE ≤ AROME 2.5) stays open pending the
+frozen baseline — until then the columns collect data but stay hidden. See
+`docs/notes/gated-model-columns.md`.
+
 ---
 
 ## 6. Stage 3 — refinements

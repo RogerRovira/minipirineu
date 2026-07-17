@@ -22,9 +22,14 @@ $meteocat_html
   <p>* AROME HD no publica nieve: cm estimados a partir de su precipitación y la temperatura en la cota
      (ratio ajustado contra AROME 2.5; ver repositorio). T = temperatura prevista en la cota (AROME 2.5).</p>
   <p>Página generada el $generated_label. Los datos se regeneran cada ~6h; si una fuente aparece en rojo, está caducada.</p>
+  <p>Columnas en evaluación ocultas (HARMONIE KNMI/DMI y ECMWF IFS 9 km): añade <code>?modelos=todos</code>
+     a la URL para verlas. Aún sin verificar contra observaciones (ROADMAP S2.3).</p>
 </footer>
 <script>
 (function () {
+  if (new URLSearchParams(location.search).get("modelos") === "todos") {
+    document.body.classList.add("show-gated");
+  }
   var now = Date.now();
   document.querySelectorAll("[data-fetched-at]").forEach(function (el) {
     var fetched = Date.parse(el.getAttribute("data-fetched-at"));

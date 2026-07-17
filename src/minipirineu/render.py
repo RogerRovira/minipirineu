@@ -124,8 +124,12 @@ def render_station(station: dict) -> str:
             f'<br>{band["elevation_m"]} m</td>'
         )
         for i, model in enumerate(band["models"]):
+            # gated inter-family columns (S2.3) stay hidden until the page is
+            # opened with ?modelos=todos; old snapshots without the key render
+            # as before
+            gated_cls = ' class="gated"' if model.get("gated") else ""
             rows.append(
-                "<tr>"
+                f"<tr{gated_cls}>"
                 + (cota if i == 0 else "")
                 + f'<td class="cota">{model_row_label(model)}</td>'
                 + snow_cells(model, columns)

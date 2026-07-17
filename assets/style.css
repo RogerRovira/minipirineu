@@ -42,6 +42,11 @@ td.total { font-weight: 700; }
 tr.temp td { color: #757575; font-size: 0.75rem; }
 .model-note { color: #9e9e9e; font-weight: 400; }
 
+/* S2.3: gated inter-family columns, hidden until ?modelos=todos */
+tr.gated { display: none; }
+body.show-gated tr.gated { display: table-row; }
+tr.gated td.cota { font-style: italic; }
+
 /* Meteocat muntanya column */
 h3 { font-size: 0.95rem; margin: 1rem 0 0.2rem; }
 .mc-day h4 { font-size: 0.85rem; margin: 0.6rem 0 0.25rem; color: #424242; }

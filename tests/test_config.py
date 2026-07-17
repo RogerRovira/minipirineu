@@ -26,20 +26,35 @@ def test_coordinates_are_in_the_catalan_pyrenees():
         assert 0.7 <= station.longitude <= 2.1, station.id
 
 
-def test_models_are_the_two_arome_variants():
-    assert [spec.id for spec in MODELS] == [
+def test_default_models_are_the_two_arome_variants():
+    assert [spec.id for spec in MODELS if not spec.gated] == [
         "meteofrance_arome_france_hd",
         "meteofrance_arome_france",
     ]
 
 
+def test_gated_models_are_the_probed_inter_family_trio():
+    # S2.3: native-snowfall contrast columns, probed live over Baqueira on
+    # 2026-07-18 (docs/notes/gated-model-columns.md). ecmwf_ifs is the 9 km
+    # HRES, not the 25 km ecmwf_ifs025. Hidden behind ?modelos=todos.
+    assert [spec.id for spec in MODELS if spec.gated] == [
+        "knmi_harmonie_arome_europe",
+        "dmi_harmonie_arome_europe",
+        "ecmwf_ifs",
+    ]
+
+
 def test_snowfall_sources_match_validated_api_reality():
     # AROME HD serves no snowfall variable on Open-Meteo (M1 finding);
-    # AROME 2.5 does. See docs/notes/snowfall-semantics.md.
+    # AROME 2.5 does (docs/notes/snowfall-semantics.md). All three gated
+    # models serve it natively (2026-07-18 probe).
     sources = {spec.id: spec.snowfall_source for spec in MODELS}
     assert sources == {
         "meteofrance_arome_france_hd": "derived",
         "meteofrance_arome_france": "native",
+        "knmi_harmonie_arome_europe": "native",
+        "dmi_harmonie_arome_europe": "native",
+        "ecmwf_ifs": "native",
     }
 
 

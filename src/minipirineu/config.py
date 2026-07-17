@@ -26,6 +26,11 @@ class ModelSpec:
     #   (AROME HD serves no snowfall in any form — validated 2026-07,
     #   see docs/notes/snowfall-semantics.md).
     snowfall_source: str
+    # Gated (ROADMAP S2.3): inter-family contrast columns hidden behind
+    # ?modelos=todos until a scored winter month shows MAE ≤ AROME 2.5's.
+    # Fetched in a separate request and allowed to degrade to "unavailable"
+    # so an experimental column can never take down the AROME data.
+    gated: bool = False
 
 
 STATIONS: tuple[Station, ...] = (
@@ -52,11 +57,18 @@ STATIONS: tuple[Station, ...] = (
     ),
 )
 
-# AROME models served by Open-Meteo, in display order. The brief requires
-# requesting these explicitly (never best_match).
+# Models served by Open-Meteo, in display order: first the default AROME
+# pair (the brief requires requesting these explicitly — never best_match),
+# then the gated inter-family columns (S2.3), all with native snowfall,
+# probed live over Baqueira on 2026-07-18 (docs/notes/gated-model-columns.md).
+# "ecmwf_ifs" is the 9 km IFS HRES — the exact model the brief's deferred
+# column asked for — not the 25 km ecmwf_ifs025.
 MODELS: tuple[ModelSpec, ...] = (
     ModelSpec("meteofrance_arome_france_hd", "AROME HD 1.3 km", snowfall_source="derived"),
     ModelSpec("meteofrance_arome_france", "AROME 2.5 km", snowfall_source="native"),
+    ModelSpec("knmi_harmonie_arome_europe", "HARMONIE KNMI", snowfall_source="native", gated=True),
+    ModelSpec("dmi_harmonie_arome_europe", "HARMONIE DMI", snowfall_source="native", gated=True),
+    ModelSpec("ecmwf_ifs", "IFS 9 km (ECMWF)", snowfall_source="native", gated=True),
 )
 
 # Derived snowfall (models without native snowfall): cm of snow per mm of

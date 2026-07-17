@@ -40,13 +40,77 @@ def snowfall_series(spec, series: dict) -> list:
     """Pick the model's snowfall: native output, or derived from precip + temp.
 
     A "native" model whose snowfall comes back all-null means Open-Meteo
-    changed what it serves — fail loudly rather than quietly derive.
+    changed what it serves — fail loudly rather than quietly derive. (For
+    gated models the caller downgrades that failure to an "unavailable"
+    entry instead of killing the run.)
     """
     if spec.snowfall_source == "native":
         if not any(v is not None for v in series["snowfall_cm"]):
             raise ValueError(f"{spec.id}: native snowfall is all null")
         return series["snowfall_cm"]
     return aggregate.derive_snowfall(series["precipitation_mm"], series["temperature_c"])
+
+
+def model_entry(spec, parsed: dict, now_local: datetime) -> dict:
+    series = parsed["models"][spec.id]
+    agg = aggregate.to_buckets(
+        parsed["time"],
+        snowfall_series(spec, series),
+        series["precipitation_mm"],
+        series["temperature_c"],
+        now_local,
+    )
+    return {
+        "model": spec.id,
+        "label": spec.label,
+        "snowfall_source": spec.snowfall_source,
+        "gated": spec.gated,
+        **agg,
+    }
+
+
+def unavailable_entry(spec) -> dict:
+    """Placeholder for a gated model whose fetch or series broke: every cell
+    renders as "—". Totals stay None — a missing column must never show 0."""
+    return {
+        "model": spec.id,
+        "label": spec.label,
+        "snowfall_source": spec.snowfall_source,
+        "gated": True,
+        "unavailable": True,
+        "intervals": [],
+        "total_snowfall_cm": None,
+        "total_precipitation_mm": None,
+        "effective_horizon_h": 0,
+    }
+
+
+def fetch_gated(session: requests.Session, station, elevation_m: int) -> dict | None:
+    """Fetch the gated inter-family models (S2.3). Any failure — network,
+    an id Open-Meteo dropped (HTTP 400), schema surprise — degrades to None:
+    experimental columns may go missing, the AROME ingest may not."""
+    try:
+        raw = openmeteo.fetch(session, station, elevation_m, openmeteo.GATED_MODEL_IDS)
+        return openmeteo.parse_response(raw, openmeteo.GATED_MODEL_IDS)
+    except (requests.RequestException, ValueError, KeyError) as exc:
+        print(
+            f"WARN {station.id}/{elevation_m}m: gated models unavailable: {exc}",
+            file=sys.stderr,
+        )
+        return None
+
+
+def gated_entry(spec, gated_parsed: dict | None, now_local: datetime) -> dict:
+    if gated_parsed is None:
+        return unavailable_entry(spec)
+    try:
+        entry = model_entry(spec, gated_parsed, now_local)
+    except (ValueError, KeyError) as exc:
+        print(f"WARN {spec.id}: unavailable: {exc}", file=sys.stderr)
+        return unavailable_entry(spec)
+    if not entry["intervals"]:
+        return unavailable_entry(spec)
+    return entry
 
 
 def build_snapshot(session: requests.Session, now_local: datetime) -> dict:
@@ -56,24 +120,13 @@ def build_snapshot(session: requests.Session, now_local: datetime) -> dict:
         for band, elevation_m in station.bands:
             raw = openmeteo.fetch(session, station, elevation_m)
             parsed = openmeteo.parse_response(raw)
-            models_out = []
-            for spec in MODELS:
-                series = parsed["models"][spec.id]
-                agg = aggregate.to_buckets(
-                    parsed["time"],
-                    snowfall_series(spec, series),
-                    series["precipitation_mm"],
-                    series["temperature_c"],
-                    now_local,
-                )
-                models_out.append(
-                    {
-                        "model": spec.id,
-                        "label": spec.label,
-                        "snowfall_source": spec.snowfall_source,
-                        **agg,
-                    }
-                )
+            gated_parsed = fetch_gated(session, station, elevation_m)
+            models_out = [
+                gated_entry(spec, gated_parsed, now_local)
+                if spec.gated
+                else model_entry(spec, parsed, now_local)
+                for spec in MODELS
+            ]
             bands_out.append(
                 {
                     "band": band,
@@ -113,6 +166,12 @@ def validate(snapshot: dict) -> None:
                 raise ValueError(f"{station['id']}/{band['band']}: missing models")
             for model in band["models"]:
                 where = f"{station['id']}/{band['band']}/{model['model']}"
+                if model.get("unavailable"):
+                    # only gated models may publish an empty column, and an
+                    # unavailable one must be visibly empty, not half-filled
+                    if not model.get("gated") or model["intervals"]:
+                        raise ValueError(f"{where}: invalid unavailable marker")
+                    continue
                 if not model["intervals"]:
                     raise ValueError(f"{where}: no intervals")
                 for iv in model["intervals"]:
@@ -154,7 +213,8 @@ def main(out_path: Path = DEFAULT_OUT) -> int:
         print(f"openmeteo ingest FAILED, keeping previous {out_path}: {exc}", file=sys.stderr)
         return 1
     atomic_write_json(out_path, snapshot)
-    n_calls = sum(len(s.bands) for s in STATIONS)
+    # one default (AROME) + one gated request per station/band
+    n_calls = sum(len(s.bands) for s in STATIONS) * 2
     print(f"wrote {out_path} ({n_calls} API calls, fetched_at {snapshot['fetched_at']})")
     return 0
 

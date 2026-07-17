@@ -59,6 +59,33 @@ def test_parse_recorded_response():
     assert parsed["grid_elevation_m"] == 2000
 
 
+def test_build_params_gated_models_are_explicit():
+    params = openmeteo.build_params(BAQUEIRA, 2000, openmeteo.GATED_MODEL_IDS)
+    assert params["models"] == "knmi_harmonie_arome_europe,dmi_harmonie_arome_europe,ecmwf_ifs"
+    assert "best_match" not in str(params)
+    # everything except the model list matches the default request
+    default = openmeteo.build_params(BAQUEIRA, 2000)
+    assert {k: v for k, v in params.items() if k != "models"} == {
+        k: v for k, v in default.items() if k != "models"
+    }
+
+
+def test_parse_recorded_gated_response():
+    # recorded 2026-07-18: all three gated models serve every variable over
+    # the first 48h at Baqueira/2000 m, snowfall included (native)
+    raw = json.loads((FIXTURES / "openmeteo_gated_baqueira_2000.json").read_text())
+    parsed = openmeteo.parse_response(raw, openmeteo.GATED_MODEL_IDS)
+
+    assert set(parsed["models"]) == set(openmeteo.GATED_MODEL_IDS)
+    n = len(parsed["time"])
+    assert n >= 48
+    for model_id, series in parsed["models"].items():
+        for key in ("snowfall_cm", "precipitation_mm", "temperature_c"):
+            assert len(series[key]) == n, (model_id, key)
+        assert all(v is not None for v in series["snowfall_cm"][:48]), model_id
+    assert parsed["grid_elevation_m"] == 2000
+
+
 def test_parse_rejects_length_mismatch():
     hourly = {"time": ["2026-07-14T00:00", "2026-07-14T01:00"]}
     for model_id in ("meteofrance_arome_france_hd", "meteofrance_arome_france"):

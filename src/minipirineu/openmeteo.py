@@ -17,10 +17,14 @@ from minipirineu.config import MODELS, TIMEZONE
 
 API_URL = "https://api.open-meteo.com/v1/forecast"
 HOURLY_VARS = ("snowfall", "precipitation", "temperature_2m")
-MODEL_IDS = tuple(spec.id for spec in MODELS)
+# The default AROME pair and the gated inter-family trio (S2.3) travel in
+# separate requests: one bad gated model id turns the whole HTTP request into
+# a 400, and that must never be able to poison the AROME fetch.
+DEFAULT_MODEL_IDS = tuple(spec.id for spec in MODELS if not spec.gated)
+GATED_MODEL_IDS = tuple(spec.id for spec in MODELS if spec.gated)
 
 
-def build_params(station, elevation_m: int) -> dict:
+def build_params(station, elevation_m: int, model_ids: tuple = DEFAULT_MODEL_IDS) -> dict:
     """Query params for one station/band.
 
     models= is always explicit: best_match would silently substitute a global
@@ -31,7 +35,7 @@ def build_params(station, elevation_m: int) -> dict:
         "latitude": station.latitude,
         "longitude": station.longitude,
         "elevation": elevation_m,
-        "models": ",".join(MODEL_IDS),
+        "models": ",".join(model_ids),
         "hourly": ",".join(HOURLY_VARS),
         "timezone": TIMEZONE,
         # 3 local days always cover now+48h regardless of the run hour
@@ -39,13 +43,19 @@ def build_params(station, elevation_m: int) -> dict:
     }
 
 
-def fetch(session: requests.Session, station, elevation_m: int, timeout: int = 30) -> dict:
-    resp = session.get(API_URL, params=build_params(station, elevation_m), timeout=timeout)
+def fetch(
+    session: requests.Session,
+    station,
+    elevation_m: int,
+    model_ids: tuple = DEFAULT_MODEL_IDS,
+    timeout: int = 30,
+) -> dict:
+    resp = session.get(API_URL, params=build_params(station, elevation_m, model_ids), timeout=timeout)
     resp.raise_for_status()
     return resp.json()
 
 
-def parse_response(raw: dict) -> dict:
+def parse_response(raw: dict, model_ids: tuple = DEFAULT_MODEL_IDS) -> dict:
     """Normalize a multi-model response into per-model hourly series.
 
     When several models are requested, Open-Meteo suffixes each hourly
@@ -57,7 +67,7 @@ def parse_response(raw: dict) -> dict:
     hourly = raw["hourly"]
     times = hourly["time"]
     models = {}
-    for model_id in MODEL_IDS:
+    for model_id in model_ids:
         series = {}
         for var in HOURLY_VARS:
             values = hourly[f"{var}_{model_id}"]

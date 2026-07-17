@@ -11,11 +11,12 @@ TEMPLATE = (Path(__file__).parent.parent / "templates" / "index.html.tmpl").read
 NOW = datetime(2026, 1, 10, 18, 30, tzinfo=timezone.utc)
 
 
-def model(model_id, label, source, intervals):
+def model(model_id, label, source, intervals, gated=False):
     return {
         "model": model_id,
         "label": label,
         "snowfall_source": source,
+        "gated": gated,
         "intervals": intervals,
         "total_snowfall_cm": round(sum(iv["snowfall_cm"] or 0 for iv in intervals), 1),
         "total_precipitation_mm": 0.0,
@@ -43,6 +44,22 @@ INTERVALS_25 = [
     # 2.5 reaches one bucket further than HD: union of columns, HD shows "—"
     interval("2026-01-11T06:00", "2026-01-11T12:00", 1.5, -5.0),
 ]
+INTERVALS_KNMI = [
+    interval("2026-01-10T18:00", "2026-01-11T00:00", 3.0, -2.2),
+    interval("2026-01-11T00:00", "2026-01-11T06:00", 0.0, -4.1),
+]
+# a gated model whose fetch failed publishes an explicitly empty column
+UNAVAILABLE_IFS = {
+    "model": "ecmwf_ifs",
+    "label": "IFS 9 km (ECMWF)",
+    "snowfall_source": "native",
+    "gated": True,
+    "unavailable": True,
+    "intervals": [],
+    "total_snowfall_cm": None,
+    "total_precipitation_mm": None,
+    "effective_horizon_h": 0,
+}
 
 OPENMETEO = {
     "schema": "minipirineu/openmeteo/v1",
@@ -62,6 +79,8 @@ OPENMETEO = {
                     "models": [
                         model("meteofrance_arome_france_hd", "AROME HD 1.3 km", "derived", INTERVALS_HD),
                         model("meteofrance_arome_france", "AROME 2.5 km", "native", INTERVALS_25),
+                        model("knmi_harmonie_arome_europe", "HARMONIE KNMI", "native", INTERVALS_KNMI, gated=True),
+                        UNAVAILABLE_IFS,
                     ],
                 }
             ],
@@ -202,3 +221,39 @@ def test_snow_cells_highlighted_only_when_snowing():
     page = render()
     assert 'class="snow-some">3.2' in page
     assert 'class="snow-some">0<' not in page
+
+
+def test_gated_rows_carry_the_class_and_default_rows_do_not():
+    page = render()
+    # exactly the KNMI and IFS rows of the single fixture band are gated
+    assert page.count('<tr class="gated">') == 2
+    assert "HARMONIE KNMI" in page and "IFS 9 km (ECMWF)" in page
+    # the AROME rows stay plain, and the cota rowspan still counts every
+    # model row (4 models + temp) so the hidden rows collapse cleanly
+    assert '<tr><td class="cota" rowspan="5">' in page
+
+
+def test_unavailable_gated_model_renders_dashes_never_zero():
+    page = render()
+    # IFS fetch failed → its total is an em dash, not 0
+    assert '<td class="total">—</td>' in page
+
+
+def test_old_snapshots_without_gated_key_render_as_before():
+    import copy
+
+    old = copy.deepcopy(OPENMETEO)
+    models = old["stations"][0]["bands"][0]["models"]
+    del models[3], models[2]  # pre-S2.3 snapshot: only the AROME pair
+    for m in models:
+        del m["gated"]
+    page = render(openmeteo=old)
+    assert '<tr class="gated">' not in page
+    assert "AROME HD 1.3 km" in page
+
+
+def test_url_gate_wiring_present_in_template_and_css():
+    # the render marks rows; the static assets must carry the actual gate
+    assert 'get("modelos")' in TEMPLATE and "show-gated" in TEMPLATE
+    css = (Path(__file__).parent.parent / "assets" / "style.css").read_text()
+    assert "tr.gated" in css and "body.show-gated tr.gated" in css
