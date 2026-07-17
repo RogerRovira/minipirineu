@@ -1,8 +1,10 @@
+import json
 from datetime import datetime, timezone
 from pathlib import Path
 
 import pytest
 
+from minipirineu.render import main as render_main
 from minipirineu.render import render_page
 
 TEMPLATE = (Path(__file__).parent.parent / "templates" / "index.html.tmpl").read_text()
@@ -72,10 +74,23 @@ METEOCAT = {
     "fetched_at": "2026-01-10T07:00:00+00:00",
     "zones": [
         {
-            "zone_id": "an",
-            "zone_name": "Aran - Franja Nord",
-            "stations": ["baqueira"],
-            "days": [{"date": "2026-01-10", "summary": "Nevades febles al vessant nord."}],
+            "zone_id": 1,
+            "zone_name": "Vessant nord Pirineu occidental",
+            "stations": ["Baqueira"],
+            "days": [
+                {
+                    "date": "2026-01-10",
+                    "blocks": [
+                        {"start": 0, "cel": 1, "probabilitat": 1, "cota_m": None},
+                        {"start": 6, "cel": 10, "probabilitat": 5, "cota_m": 1800},
+                        # unknown future code + missing probabilitat: never crash
+                        {"start": 12, "cel": 99, "probabilitat": None, "cota_m": 1600.0},
+                        {"start": 18, "cel": 4, "probabilitat": 3, "cota_m": None},
+                    ],
+                    "acumulacio": 3,
+                    "acumulacio_neu": 4,
+                }
+            ],
         }
     ],
 }
@@ -122,7 +137,7 @@ def test_missing_openmeteo_renders_placeholder_and_keeps_meteocat():
     page = render(openmeteo=None)
     assert "Sin datos de modelo" in page
     assert 'class="badge missing"' in page
-    assert "Aran - Franja Nord" in page  # other source unaffected
+    assert "Vessant nord Pirineu occidental" in page  # other source unaffected
 
 
 def test_missing_meteocat_renders_placeholder_and_keeps_stations():
@@ -140,8 +155,47 @@ def test_page_renders_with_no_data_at_all():
 def test_meteocat_zone_rendering():
     page = render()
     assert "Predicció de muntanya" in page
-    assert "Nevades febles" in page
-    assert "baqueira" in page
+    assert "Vessant nord Pirineu occidental" in page
+    assert "(Baqueira)" in page
+    # 2026-01-10 is a Saturday; day header carries weekday + dd/mm
+    assert "sáb 10/01" in page
+
+
+def test_meteocat_codes_render_as_official_labels():
+    page = render()
+    assert "Cel serè" in page   # cel 1, from the simbols catalog
+    assert "Nevada" in page     # cel 10
+    assert "&gt;70%" in page    # probabilitat 5
+    assert "5–10 cm" in page    # acumulacioNeu bin 4 (bins, never cm amounts)
+    assert "5–20 mm" in page    # acumulacio bin 3
+
+
+def test_meteocat_unknown_code_and_missing_values_are_safe():
+    page = render()
+    assert ">99<" in page       # unknown cel code shows the raw code
+    assert "1800 m" in page     # cota in metres
+    # None cota / probabilitat render as em dash, never 0
+    assert "—" in page
+
+
+def test_meteocat_attribution_present():
+    page = render()
+    assert "meteo.cat" in page
+
+
+def test_main_writes_utf8_regardless_of_platform_default(tmp_path):
+    # Σ and the accented labels must survive platforms whose default file
+    # encoding is not UTF-8 (Windows cp1252) — the page declares charset=utf-8
+    data = tmp_path / "data"
+    data.mkdir()
+    (data / "openmeteo.json").write_text(json.dumps(OPENMETEO), encoding="utf-8")
+    (data / "meteocat.json").write_text(json.dumps(METEOCAT), encoding="utf-8")
+    site = tmp_path / "site"
+    assert render_main(data, site) == 0
+    page = (site / "index.html").read_bytes().decode("utf-8")
+    assert "Σ 48h" in page
+    assert "Boí Taüll" not in page  # only Baqueira in the fixture
+    assert "Cel serè" in page       # utf-8 read back intact
 
 
 def test_snow_cells_highlighted_only_when_snowing():

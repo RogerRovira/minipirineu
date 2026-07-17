@@ -77,10 +77,51 @@ BUCKET_HOURS = 6
 # Open-Meteo refreshes every 6h (one missed run + slack); Meteocat twice a day.
 STALE_AFTER_H = {"openmeteo": 7, "meteocat": 26}
 
-# Station -> Meteocat "predicció de muntanya" zone. Zone codes are an open
-# question in the brief, to be confirmed in milestone 3.
-METEOCAT_ZONE_BY_STATION: dict[str, str | None] = {
-    "baqueira": None,  # expected: Aran - Franja Nord
-    "boi-taull": None,
-    "la-molina": None,
+# Station -> Meteocat pronostic Pirineu zone id (the endpoint's OWN 7-zone
+# scheme; ids 1,3,4,5,6,7,8 — NOT the map's "Zona 1..7" numbering).
+# CONFIRMED 2026-07-17: the user double-checked the official zone map; see
+# docs/notes/meteocat-pronostic-semantics.md. All zones are archived anyway,
+# so a revision would need no re-ingest.
+METEOCAT_ZONE_BY_STATION: dict[str, int] = {
+    "baqueira": 1,   # Vessant nord Pirineu occidental
+    "boi-taull": 5,  # Vessant sud Pirineu occidental
+    "la-molina": 6,  # Prepirineu oriental
+}
+
+
+@dataclass(frozen=True)
+class MeteocatAnchor:
+    """A pronostic pics/refugis forecast point whose isozero and upper winds
+    track a resort's massif. Primaries are the resort peaks themselves;
+    secondaries add isozero coverage for winter verification. Fetched ONE per
+    day on a quota rotation (Predicció plan: 100 calls/month)."""
+
+    codi: str
+    station_id: str  # which resort's massif this anchor tracks
+    name: str        # storage station name for verification rows
+    primary: bool
+
+
+# Selection ported from PiriNeu (2026-07-13 thermal-anchor selection).
+METEOCAT_ANCHORS: tuple[MeteocatAnchor, ...] = (
+    MeteocatAnchor("77954ad7", "baqueira", "baqueira", True),       # Cap de Vaquèira
+    MeteocatAnchor("962535ca", "baqueira", "marimanya", False),     # Tuc de Marimanya
+    MeteocatAnchor("b65b37e8", "baqueira", "airoto", False),        # Airoto
+    MeteocatAnchor("8245e5c9", "baqueira", "gerdar", False),        # Refugi del Gerdar
+    MeteocatAnchor("246d5775", "boi-taull", "boi_taull", True),     # Pica de Cerví
+    MeteocatAnchor("6e5cedc5", "boi-taull", "filia", False),        # Pic de Filià
+    MeteocatAnchor("a4d20c1f", "boi-taull", "corronco", False),     # Lo Corronco
+    MeteocatAnchor("4d04de5e", "la-molina", "la_molina", True),     # La Tosa d'Alp
+    MeteocatAnchor("5bb98db1", "la-molina", "puigllancada", False), # Puigllançada
+    MeteocatAnchor("a9f7eb3a", "la-molina", "pere_carne", False),   # Refugi Pere Carné
+)
+
+# Canonical pics-metadades coordinates for the PRIMARY anchors (fetched
+# 2026-07-12 in PiriNeu, re-confirmed on the 2026-07-17 fixtures). Ingest
+# alerts if the metadades ever drift from these (a silent renumbering would
+# corrupt the anchor->resort assignment).
+METEOCAT_ANCHOR_COORDS: dict[str, tuple[float, float]] = {
+    "77954ad7": (42.6918885, 0.9742379),  # Cap de Vaquèira
+    "246d5775": (42.4529432, 0.8792261),  # Pica de Cerví
+    "4d04de5e": (42.3205751, 1.8926609),  # La Tosa d'Alp
 }

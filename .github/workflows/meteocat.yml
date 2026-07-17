@@ -1,0 +1,84 @@
+# Meteocat pronostic ingest, decoupled from the 6h forecast cron (100
+# calls/month quota — see the brief). Two slots/day: ~13:40 UTC lands after
+# the ~14:00 Europe/Madrid product refresh in both DST regimes; the ~19:40
+# slot is a pure retry — the CLI's is_fresh gate makes it a no-op when the
+# first slot succeeded, so the quota stays at ~3 calls/day.
+name: meteocat
+
+on:
+  schedule:
+    - cron: "40 13,19 * * *" # off-the-hour to dodge scheduled-run congestion
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+# Serialize with forecast.yml: both commit to main, write the datastore
+# branch (one writer at a time, ADR-0002) and deploy Pages.
+concurrency:
+  group: publish
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -e .
+
+      - uses: ./.github/actions/datastore-checkout
+
+      # A failed ingest must not block publishing: the site is rebuilt with
+      # the last-good JSON, whose old timestamp shows up as stale.
+      - name: Ingest Meteocat
+        id: ingest
+        continue-on-error: true
+        env:
+          METEOCAT_API_KEY: ${{ secrets.METEOCAT_API_KEY }}
+          MINIPIRINEU_DATA_DIR: datastore
+        run: python -m minipirineu.ingest_meteocat
+
+      # Archive-before-parse: raw payloads may exist even when the ingest
+      # failed later — commit them regardless of the step outcome.
+      - uses: ./.github/actions/datastore-commit
+        with:
+          message: "meteocat: raw payloads + verification store"
+
+      - name: Commit refreshed data
+        if: steps.ingest.outcome == 'success'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/meteocat.json
+          git diff --cached --quiet || {
+            git commit -m "data: meteocat refresh"
+            git pull --rebase origin main
+            git push
+          }
+
+      - name: Render site
+        run: python -m minipirineu.render
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+      # Deploy succeeded with old data, but the run must show red so the
+      # failure is noticed (GitHub emails on workflow failure).
+      - name: Fail the run if ingest failed
+        if: steps.ingest.outcome == 'failure'
+        run: |
+          echo "::error::Meteocat ingest failed; site was deployed with last-good data"
+          exit 1

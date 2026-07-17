@@ -1,0 +1,22 @@
+# Check out (or bootstrap, on first ever run) the datastore branch (ADR-0002)
+# into ./datastore. Ingest steps then run with MINIPIRINEU_DATA_DIR pointing
+# there; pair with datastore-commit at the end of the job.
+name: datastore-checkout
+description: Clone or bootstrap the datastore branch into ./datastore
+
+runs:
+  using: composite
+  steps:
+    - shell: bash
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        set -eu
+        url="https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+        if git ls-remote --exit-code --heads "$url" datastore >/dev/null; then
+          git clone --depth 1 --branch datastore "$url" datastore
+        else
+          git init -b datastore datastore
+          git -C datastore remote add origin "$url"
+          echo "Archivo raw + store de verificación (docs/adr/0002)." > datastore/README.md
+        fi

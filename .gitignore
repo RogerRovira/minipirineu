@@ -1,6 +1,10 @@
 .venv/
+.env
 __pycache__/
 *.egg-info/
 .pytest_cache/
 site/
 .DS_Store
+# local checkout/workdir of the datastore branch (ADR-0002); CI checks it out
+# as a separate clone, never as a subdirectory of main's working tree
+datastore/

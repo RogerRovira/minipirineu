@@ -7,7 +7,11 @@ name = "minipirineu"
 version = "0.1.0"
 description = "Nieve prevista a 48h por cota en Baqueira, Boí Taüll y La Molina (AROME vía Open-Meteo)"
 requires-python = ">=3.12"
-dependencies = ["requests>=2.31"]
+dependencies = [
+    "requests>=2.31",
+    # zoneinfo has no system tz database to fall back on under Windows
+    "tzdata; sys_platform == 'win32'",
+]
 
 [project.optional-dependencies]
 dev = ["pytest>=8"]

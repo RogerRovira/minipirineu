@@ -14,13 +14,12 @@ from pathlib import Path
 from string import Template
 
 from minipirineu.config import STALE_AFTER_H
+from minipirineu.render_meteocat import DAY_ABBREV, render_meteocat
 
 TEMPLATE_PATH = Path("templates/index.html.tmpl")
 STYLE_PATH = Path("assets/style.css")
 DATA_DIR = Path("data")
 SITE_DIR = Path("site")
-
-DAY_ABBREV = ("lun", "mar", "mié", "jue", "vie", "sáb", "dom")
 
 # The temperature row shows the native model's take (AROME 2.5); the derived
 # HD snow already encodes HD's own temperature.
@@ -30,7 +29,7 @@ TEMP_MODEL = "meteofrance_arome_france"
 def load_source(path: Path) -> dict | None:
     """A source that is missing or unreadable renders as absent, never crashes."""
     try:
-        return json.loads(path.read_text())
+        return json.loads(path.read_text(encoding="utf-8"))
     except (OSError, ValueError):
         return None
 
@@ -156,26 +155,6 @@ def render_openmeteo(data: dict | None) -> str:
     return "\n".join(render_station(station) for station in data["stations"])
 
 
-def render_meteocat(data: dict | None) -> str:
-    if data is None:
-        return (
-            '<section><h2>Predicció de muntanya (Meteocat)</h2>'
-            '<div class="placeholder">Sin datos del Meteocat.</div></section>'
-        )
-    zones = []
-    for zone in data["zones"]:
-        days = "".join(
-            f'<p><strong>{html.escape(day["date"])}</strong> {html.escape(day.get("summary", ""))}</p>'
-            for day in zone["days"]
-        )
-        stations = ", ".join(zone["stations"])
-        zones.append(
-            f'<h3>{html.escape(zone["zone_name"])} <span class="model-note">'
-            f"({html.escape(stations)})</span></h3>{days}"
-        )
-    return f'<section><h2>Predicció de muntanya (Meteocat)</h2>{"".join(zones)}</section>'
-
-
 def render_page(
     openmeteo: dict | None,
     meteocat: dict | None,
@@ -202,10 +181,12 @@ def main(data_dir: Path = DATA_DIR, site_dir: Path = SITE_DIR) -> int:
         load_source(data_dir / "openmeteo.json"),
         load_source(data_dir / "meteocat.json"),
         now_utc,
-        TEMPLATE_PATH.read_text(),
+        TEMPLATE_PATH.read_text(encoding="utf-8"),
     )
     site_dir.mkdir(parents=True, exist_ok=True)
-    (site_dir / "index.html").write_text(page)
+    # explicit utf-8: the page declares charset=utf-8 and must not depend on
+    # the platform's default encoding (Windows: cp1252, which lacks Σ)
+    (site_dir / "index.html").write_text(page, encoding="utf-8")
     shutil.copy(STYLE_PATH, site_dir / "style.css")
     print(f"wrote {site_dir}/index.html")
     return 0

@@ -1,0 +1,33 @@
+# Commit and push whatever the job wrote into ./datastore (ADR-0002).
+# Workflows using this must share `concurrency: group: datastore` so there is
+# one writer at a time; the rebase loop is belt-and-braces against a manual
+# push racing a scheduled one (pattern lifted from PiriNeu, proven in prod).
+name: datastore-commit
+description: Commit ./datastore changes to the datastore branch (rebase-retry push)
+
+inputs:
+  message:
+    description: Commit message for the datastore commit
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - shell: bash
+      run: |
+        set -eu
+        cd datastore
+        git add -A
+        if git diff --cached --quiet; then
+          echo "nothing new to commit"
+          exit 0
+        fi
+        git -c user.name="minipirineu-datastore" \
+            -c user.email="actions@users.noreply.github.com" \
+            commit -m "${{ inputs.message }}"
+        for i in 1 2 3; do
+          git push origin datastore && exit 0
+          git pull --rebase origin datastore || true
+          sleep $((i * 5))
+        done
+        exit 1
