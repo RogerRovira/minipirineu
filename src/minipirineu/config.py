@@ -190,3 +190,47 @@ XEMA_STATIONS: tuple[XemaStation, ...] = (
     XemaStation("ZE", "el Port del Comte", 2288, "high", None, False),
     XemaStation("DG", "Núria", 1971, "high", None, False),
 )
+
+
+# --- truth-A: fresh snow from snow-depth increments (S0.4a/T6) ---------------
+#
+# Coefficients live here (not hardcoded in truth.py) so they can be re-fitted
+# against documented storms without touching the algorithm. Anchors and the
+# two-layer settling design are in docs/adr/0004-truth-pipeline.md.
+
+# Anderson (1976) destructive-metamorphism settling of the NEW-snow layer:
+#   S(T) = C3 · exp(C4 · T)  [fraction per second], T = snow temp °C (≤ 0).
+# C3 ≈ 1 %/h at 0 °C; colder snow settles slower. Confirmed against Helfricht
+# et al. (2018, HESS 22, 2655) who use exactly these on sub-daily automated HS.
+SETTLING_C3_PER_S = 2.777e-6
+SETTLING_C4_PER_C = 0.04
+# A layer settles (counts as "new") for this long, then joins the old pack,
+# which is treated as non-settling: a seasonal pack (ρ≈300–400) has Anderson
+# density factor exp(−0.046·(ρ−150)) ≈ 1e-4, i.e. negligible settling.
+NEW_SNOW_AGE_H = 24
+# Snow-surface temperature proxy = min(air_T, 0). When the air-T obs is missing
+# for a step, fall back to this (settling still happens physically).
+SETTLE_DEFAULT_T_C = -2.0
+
+# Hampel despike of the 30-min HS series: replace a point deviating more than
+# HAMPEL_N_SIGMAS scaled MADs from its centered-window median. Removes isolated
+# ultrasonic spikes without flattening a real snowfall step; MAD=0 flags nothing.
+HAMPEL_WINDOW = 5          # samples (odd), ~±1 h at 30-min resolution
+HAMPEL_N_SIGMAS = 4.0
+# Sensor-noise floor (cm) for the Hampel scale: on a flat window MAD=0, so a
+# bare MAD test can neither flag a real spike nor is it robust. This floor makes
+# the spike test absolute (spike ≫ floor is caught) while a ±0.5 cm jitter isn't.
+HAMPEL_MIN_SCALE_CM = 0.5
+
+# After despiking, a centered moving average (Helfricht et al. 2018 smooth the
+# ultrasonic HS the same way) over this many samples damps the ±1–3 cm 30-min
+# jitter that would otherwise be summed as fabricated snow. Wider = less noise
+# but more smear of a sharp real step across a bucket edge; 5 ≈ ±1 h. Set to 1
+# to disable (the unit tests isolate the increment logic that way).
+TRUTH_SMOOTH_WINDOW = 5
+
+# Verification buckets are 6 h in UTC (BUCKET_HOURS), aligned to 00/06/12/18.
+# A gap between consecutive readings longer than this marks the affected
+# bucket incomplete (truth None, never 0). Nominal step is 30 min; 90 tolerates
+# a single dropout without crossing into "unknown accumulation".
+TRUTH_MAX_STEP_MIN = 90

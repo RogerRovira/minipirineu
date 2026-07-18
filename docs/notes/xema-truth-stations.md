@@ -49,6 +49,34 @@ Z3 Malniu (2229), Z5 Certascan (2398), Z7 Espot (2519), ZE el Port del Comte
 Se almacenan como `obs.<slug>`. **La var 9 del borrador del ROADMAP NO existe**
 en las metadades de variables de la XEMA — se descarta.
 
+### ⚠️ var 38 cambia de unidad: mm antes de ~2022, cm después (T6, 2026-07-18)
+
+Descubierto al construir el golden de T6. El gruix de neu (var 38) **no está en
+las mismas unidades en toda la historia**:
+
+| ventana | Z1 (var 38) | Z2 (var 38) | unidad |
+|---|---|---|---|
+| 2020-01 (Gloria) | 740–1220 | 780–1550 | **mm** (÷10 = 74–122 / 78–155 cm) |
+| 2021-02 | 1210–1650 | 370–880 | **mm** |
+| 2022-02 | 178–179 | — | **cm** |
+| 2023-02 | 57 | — | cm |
+| 2024-02 | 39–44 | 20–37 | cm |
+| 2025-03 (storm golden) | ~90–137 | ~57–132 | cm |
+| 2026-02-01 (sonda T5) | 172 | 108 | cm |
+
+El salto de escala ×10 ocurre **entre el invierno 2020-21 y el 2021-22**. La
+sonda de T5 solo miró 2026 (cm), así que este cambio pasó desapercibido.
+
+**Consecuencia para el backfill multi-invierno (cola de T5) y para T6/T7**: un
+backfill que cruce ~2021 mezcla mm y cm, y truth-A calcularía incrementos
+disparatados. Antes de congelar el baseline (T10) hay que: (a) fijar la fecha
+exacta de corte por estación (bisecar el open data), y (b) normalizar var 38 a
+cm en la ingesta (dividir /10 el tramo mm) **o** restringir el periodo de
+backtest a la era cm (2022→, que ya da >2 inviernos: 2022-23, 2023-24, 2024-25,
+2025-26). La segunda opción es la más limpia y evita depender de una fecha de
+corte frágil. El golden de T6 usa a propósito una tormenta de la era cm
+(2025-03-09, Z2).
+
 Ojo (para T6/T7): no todas las estaciones tienen todos los sensores. Z1
 Bonaigua **no** reporta viento (30/31/50) ni presión (34); Z9 sí reporta
 viento. "Missing is missing": el parser no inventa filas para sensores
