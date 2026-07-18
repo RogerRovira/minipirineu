@@ -1,6 +1,13 @@
 """The band elevations are confirmed in the brief; these tests pin them."""
 
-from minipirineu.config import METEOCAT_ZONE_BY_STATION, MODELS, STATIONS
+from minipirineu.config import (
+    METEOCAT_ZONE_BY_STATION,
+    MODELS,
+    STATIONS,
+    XEMA_SNOW_DEPTH_VAR,
+    XEMA_STATIONS,
+    XEMA_VARIABLES,
+)
 
 BRIEF_ELEVATIONS = {
     "baqueira": {"baja": 1500, "media": 2000, "alta": 2600},
@@ -45,3 +52,52 @@ def test_snowfall_sources_match_validated_api_reality():
 
 def test_every_station_has_a_meteocat_zone_entry():
     assert set(METEOCAT_ZONE_BY_STATION) == {s.id for s in STATIONS}
+
+
+# --- XEMA truth set (S0.3/T5) ------------------------------------------------
+
+RESORT_IDS = {s.id for s in STATIONS}
+
+
+def test_xema_stations_are_wellformed():
+    codes = [s.codi for s in XEMA_STATIONS]
+    assert len(codes) == len(set(codes)), "duplicate XEMA codes"
+    for s in XEMA_STATIONS:
+        assert s.role in {"high", "valley"}, s.codi
+        assert s.resort is None or s.resort in RESORT_IDS, s.codi
+        assert 800 <= s.altitude_m <= 2800, s.codi
+        # only scored stations may be a scored snow truth
+        assert not (s.snow_truth and s.resort is None), s.codi
+
+
+def test_every_resort_has_a_high_snow_truth_station():
+    # each resort must have a high-altitude station whose var 38 is scored,
+    # or its snow forecast can never be verified
+    for resort in RESORT_IDS:
+        highs = [s for s in XEMA_STATIONS
+                 if s.resort == resort and s.role == "high" and s.snow_truth]
+        assert highs, resort
+
+
+def test_cadi_nord_is_z9_and_la_molinas_snow_truth():
+    # user decision 2026-07-17: Cadí Nord (Z9) is La Molina's high snow-depth
+    # truth because ZD la Tosa serves no var 38 (probe 2026-07-18)
+    z9 = next(s for s in XEMA_STATIONS if s.codi == "Z9")
+    assert z9.resort == "la-molina" and z9.snow_truth
+    zd = next(s for s in XEMA_STATIONS if s.codi == "ZD")
+    assert zd.resort == "la-molina" and not zd.snow_truth
+
+
+def test_archive_wide_stations_are_unscored():
+    wide = [s for s in XEMA_STATIONS if s.resort is None]
+    assert wide, "expected archive-wide snow-depth EMAs"
+    assert all(not s.snow_truth for s in wide)
+
+
+def test_xema_variables_cover_the_probed_set_without_phantom_nine():
+    # var 9 was in an early roadmap draft but is not a real XEMA variable
+    assert "9" not in XEMA_VARIABLES
+    assert XEMA_SNOW_DEPTH_VAR == "38"
+    assert XEMA_VARIABLES["38"] == "gruix_neu"
+    # the phase/undercatch and band-T variables are all present
+    assert {"30", "32", "35", "50"} <= set(XEMA_VARIABLES)
