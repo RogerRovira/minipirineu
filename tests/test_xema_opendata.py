@@ -37,6 +37,13 @@ def test_build_query_window_is_half_open():
     assert "data_lectura < '2024-02-01T00:00:00'" in params["$where"]
 
 
+def test_build_query_restricts_to_semihourly_base():
+    # the store key omits codi_base; restricting to SH keeps one row per instant
+    # and drops the dataset's hourly (HO) and corrupt-base rows
+    params = xema_opendata.build_query(["Z1"], ["38"], "a", "b")
+    assert "codi_base = 'SH'" in params["$where"]
+
+
 def test_build_query_paging():
     p = xema_opendata.build_query(["Z1"], ["38"], "a", "b", limit=1000, offset=3000)
     assert p["$limit"] == 1000 and p["$offset"] == 3000
@@ -122,6 +129,27 @@ def test_parse_skips_rows_without_timestamp():
         [{"codi_estacio": "Z1", "codi_variable": "38", "valor_lectura": "10"}]
     )
     assert rows == []
+
+
+def test_parse_skips_row_missing_station_without_crashing():
+    # one malformed record must not raise and sink the whole backfill chunk
+    rows = xema_opendata.parse_rows(
+        [{"codi_variable": "38", "data_lectura": "2026-02-01T11:00:00.000", "valor_lectura": "10"},
+         {"codi_estacio": "", "codi_variable": "38", "data_lectura": "2026-02-01T11:00:00.000", "valor_lectura": "10"},
+         {"codi_estacio": "Z1", "codi_variable": "38", "data_lectura": "2026-02-01T11:00:00.000", "valor_lectura": "10"}]
+    )
+    assert [r.station for r in rows] == ["Z1"]
+
+
+def test_nonfinite_readings_collapse_to_none():
+    # "NaN"/"inf" parse as floats but are not real readings, and NaN would
+    # poison the idempotent upsert (NaN != NaN)
+    rows = xema_opendata.parse_rows(
+        [{"codi_estacio": "Z1", "codi_variable": "38",
+          "data_lectura": "2026-02-01T11:00:00.000", "valor_lectura": v}
+         for v in ("NaN", "inf", "-inf", "Infinity")]
+    )
+    assert [r.value for r in rows] == [None, None, None, None]
 
 
 def test_variable_slugs_are_shell_and_sql_safe():

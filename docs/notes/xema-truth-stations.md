@@ -60,7 +60,13 @@ Z1 no habrá viento y esos buckets caerán en el gate por datos ausentes.
 - Columnas: `codi_estacio, codi_variable, data_lectura, valor_lectura,
   codi_base, id`. **No hay columna `codi_estat`** en el open data (a
   diferencia de la API XEMA); la única marca de base es `codi_base`.
-- `codi_base = "SH"` = semi-horària. Lecturas cada `:00` y `:30`.
+- `codi_base = "SH"` = semi-horària. Lecturas cada `:00` y `:30`. El dataset
+  **también** trae base horària `HO` (56 M filas) y unos pocos valores de base
+  corruptos (`DQ`, `-1,5`, …), pero **nunca en mis 12 estaciones**: en toda su
+  historia 2009→ solo aparece `SH` (43,3 M filas, 0 HO). Como la PK del store
+  no incluye `codi_base`, la query filtra a `codi_base='SH'` para que "una fila
+  por instante" sea estructural y no casual (evita el colapso silencioso de dos
+  lecturas del mismo instante con bases distintas).
 - `id` = `codi_estacio + codi_variable + DDMMYYhhmm` (clave natural; no se usa,
   la PK del store ya distingue por estación/tiempo/variable).
 - Rango temporal: **2009-01-01 → presente** (>2 inviernos de sobra).

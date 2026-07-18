@@ -106,6 +106,57 @@ def test_backfill_chunk_pages_until_short(tmp_path):
     assert len(archived) == 3
 
 
+def test_backfill_chunk_paging_uses_raw_count_not_parsed_count(tmp_path):
+    # regression: a full page whose rows are partly skipped by parse_rows must
+    # NOT be read as the last page — that would silently truncate the window.
+    archive = _archive(tmp_path)
+    conn = store.connect(archive.root / "v.sqlite")
+
+    def obs(var, ts):
+        return {"codi_estacio": "Z1", "codi_variable": var,
+                "data_lectura": ts, "valor_lectura": "100"}
+
+    # page 0: 2 raw records (== page_limit) but one is an unmapped variable
+    # (999) that parse_rows drops → 1 parsed row. Data continues on page 1.
+    pages = [
+        [obs("999", "2026-02-01T00:00:00.000"), obs("38", "2026-02-01T00:00:00.000")],
+        [obs("38", "2026-02-01T00:30:00.000"), obs("38", "2026-02-01T01:00:00.000")],
+        [obs("38", "2026-02-01T01:30:00.000")],
+    ]
+    pager = FakePager(pages)
+    ingest_xema.backfill_chunk(
+        archive, conn, ["Z1"], ["38"],
+        "2026-02-01T00:00:00", "2026-03-01T00:00:00", "2026-02",
+        session=None, now_utc=NOW, fetch_page=pager, page_limit=2,
+    )
+    stored = conn.execute(
+        "SELECT COUNT(*) FROM verification_values WHERE variable='obs.gruix_neu'"
+    ).fetchone()[0]
+    # all four var-38 readings across the three pages, none lost to truncation
+    assert stored == 4
+    assert [p["$offset"] for p in pager.calls] == [0, 2, 4]
+
+
+def test_backfill_groups_do_not_overwrite_each_others_archive(tmp_path):
+    # regression: scored and wide run the same month with the same fetch
+    # timestamp; their raw pages must land in distinct files
+    archive = _archive(tmp_path)
+    conn = store.connect(archive.root / "v.sqlite")
+
+    def pager(session, params, timeout=60):
+        codi = "Z1" if "'Z1'" in params["$where"] else "Z3"
+        return json.dumps([{"codi_estacio": codi, "codi_variable": "38",
+                            "data_lectura": "2024-02-01T00:00:00.000",
+                            "valor_lectura": "50"}]).encode()
+
+    chunks = ingest_xema.month_chunks("2024-02", "2024-02")
+    ingest_xema.backfill(archive, conn, chunks, session=None, now_utc=NOW, fetch_page=pager)
+    files = list((archive.root / "raw" / "xema").rglob("*.gz"))
+    assert len(files) == 2, [f.name for f in files]
+    names = sorted(f.name for f in files)
+    assert "scored" in names[0] and "wide" in names[1]
+
+
 def test_backfill_archives_before_parsing(tmp_path):
     # a page that isn't valid JSON must still be on disk after the failure:
     # archive-before-parse means the bytes are saved before decoding (ADR-0002)
@@ -158,6 +209,46 @@ def test_scored_only_skips_the_wide_group(tmp_path):
     assert len(pager.calls) == 1  # scored group only
 
 
+def test_store_is_rebuildable_from_the_archive(tmp_path):
+    # ADR-0002 core invariant: the archive is the source of truth and the store
+    # is a rebuildable view of it. Rebuilding from the archived gzip bytes alone
+    # must reproduce the exact same rows.
+    from minipirineu import xema_opendata
+
+    archive = _archive(tmp_path)
+    conn = store.connect(archive.root / "v.sqlite")
+    pager = FakePager([json.loads(FIXTURE.read_text())])
+    ingest_xema.backfill_chunk(
+        archive, conn, ["Z1", "Z9"], list(XEMA_VARIABLES),
+        "2026-02-01T00:00:00", "2026-03-01T00:00:00", "2026-02",
+        session=None, now_utc=NOW, fetch_page=pager,
+    )
+    original = set(conn.execute(
+        "SELECT source,station,run_time_utc,valid_time_utc,variable,value FROM verification_values"
+    ).fetchall())
+
+    rebuilt_conn = store.connect(tmp_path / "rebuilt.sqlite")
+    for _path, raw in archive.iter_source("xema"):
+        store.upsert_rows(rebuilt_conn, xema_opendata.parse_payload(raw))
+    rebuilt = set(rebuilt_conn.execute(
+        "SELECT source,station,run_time_utc,valid_time_utc,variable,value FROM verification_values"
+    ).fetchall())
+
+    assert rebuilt == original and len(rebuilt) > 0
+
+
 def test_main_bad_args_returns_usage_code():
     assert ingest_xema.main([]) == 2
     assert ingest_xema.main(["2024-01"]) == 2
+
+
+def test_main_malformed_month_is_reported_not_a_traceback(capsys):
+    # a bad month must exit 2 with a clear message, never crash the process
+    assert ingest_xema.main(["2024", "2024-05"]) == 2
+    assert ingest_xema.main(["2024-13", "2024-14"]) == 2
+    assert "bad month range" in capsys.readouterr().err
+
+
+def test_main_reversed_range_is_reported(capsys):
+    assert ingest_xema.main(["2024-05", "2024-01"]) == 2
+    assert "bad month range" in capsys.readouterr().err

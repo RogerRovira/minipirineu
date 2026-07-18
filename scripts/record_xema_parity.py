@@ -18,7 +18,9 @@ same instant. Prints a PASS/FAIL line per pair; exits non-zero on any mismatch.
 """
 
 import json
+import os
 import sys
+from datetime import date, timedelta
 from pathlib import Path
 
 import requests
@@ -31,18 +33,17 @@ from minipirineu.envfile import load_env
 # to one station, for a given day. Path per the official "XEMA / Dades" docs;
 # if your subscription exposes a different route, adjust here.
 API = "https://api.meteo.cat/xema/v1/variables/mesurades/{var}/{y}/{m:02d}/{d:02d}"
-FIXture_DIR = Path("tests/fixtures/xema_api")
+FIXTURE_DIR = Path("tests/fixtures/xema_api")
 
 # A winter day with snow on the ground at both massif stations (see the
 # open-data probe, 2026-07-18). Z9 also carries wind; Z1 does not.
 STATIONS = ["Z1", "Z9"]
 VARIABLES = ["38", "32", "35"]  # snow depth, temperature, precipitation
-DAY = (2026, 2, 1)
+DAY = date(2026, 2, 1)
 
 
 def api_day(session, var, codi):
-    y, m, d = DAY
-    url = API.format(var=var, y=y, m=m, d=d)
+    url = API.format(var=var, y=DAY.year, m=DAY.month, d=DAY.day)
     resp = session.get(url, params={"codiEstacio": codi}, timeout=30)
     if resp.status_code != 200:
         raise RuntimeError(f"HTTP {resp.status_code} for {url}?codiEstacio={codi}: {resp.text[:200]}")
@@ -65,9 +66,8 @@ def api_readings(raw: bytes, codi: str) -> dict[str, float | None]:
 
 
 def opendata_readings(session, var, codi) -> dict[str, float | None]:
-    y, m, d = DAY
-    start = f"{y:04d}-{m:02d}-{d:02d}T00:00:00"
-    end = f"{y:04d}-{m:02d}-{d+1:02d}T00:00:00"
+    start = f"{DAY.isoformat()}T00:00:00"
+    end = f"{(DAY + timedelta(days=1)).isoformat()}T00:00:00"
     params = xema_opendata.build_query([codi], [var], start, end)
     rows = xema_opendata.parse_payload(xema_opendata.fetch_page(session, params))
     return {r.valid_time_utc: r.value for r in rows}
@@ -75,11 +75,11 @@ def opendata_readings(session, var, codi) -> dict[str, float | None]:
 
 def main() -> int:
     load_env()
-    key = __import__("os").environ.get("METEOCAT_API_KEY")
+    key = os.environ.get("METEOCAT_API_KEY")
     if not key:
         print("METEOCAT_API_KEY not set (.env or export it)", file=sys.stderr)
         return 2
-    FIXture_DIR.mkdir(parents=True, exist_ok=True)
+    FIXTURE_DIR.mkdir(parents=True, exist_ok=True)
     api = requests.Session()
     api.headers["X-Api-Key"] = key
     od = requests.Session()
@@ -93,7 +93,7 @@ def main() -> int:
             except RuntimeError as exc:
                 print(f"SKIP {codi}/{slug}: {exc}")
                 continue
-            (FIXture_DIR / f"{codi}_{var}_{DAY[0]}{DAY[1]:02d}{DAY[2]:02d}.json").write_bytes(raw)
+            (FIXTURE_DIR / f"{codi}_{var}_{DAY:%Y%m%d}.json").write_bytes(raw)
             api_r = api_readings(raw, codi)
             od_r = opendata_readings(od, var, codi)
             shared = sorted(set(api_r) & set(od_r))

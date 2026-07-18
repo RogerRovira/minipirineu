@@ -18,6 +18,7 @@ Usage:
     python -m minipirineu.ingest_xema 2023-11 2024-05 --scored-only
 """
 
+import json
 import sys
 from datetime import date, datetime, timezone
 from pathlib import Path
@@ -93,10 +94,13 @@ def backfill_chunk(
         )
         raw = fetch_page(session, params)
         archive.store("xema", f"{label}_p{page:03d}.json", raw, fetched_at=now_utc)
-        rows = xema_opendata.parse_payload(raw)
-        total += store.upsert_rows(conn, rows)
-        n = len(rows)
-        if n < page_limit:
+        records = json.loads(raw)  # bytes are safely archived before we decode
+        total += store.upsert_rows(conn, xema_opendata.parse_rows(records))
+        # Paging follows the API's RAW record count, never the parsed count:
+        # parse_rows may drop records (unmapped variable, malformed row), and a
+        # short *parsed* page must not be mistaken for "no more data" — that
+        # would silently truncate the backfill mid-window.
+        if len(records) < page_limit:
             return total
         offset += page_limit
         page += 1
@@ -115,19 +119,24 @@ def backfill(
     archive-wide stations pull snow depth only (zero marginal scoring cost)."""
     scored = [s.codi for s in XEMA_STATIONS if s.resort]
     wide = [s.codi for s in XEMA_STATIONS if not s.resort]
-    groups = [(scored, list(XEMA_VARIABLES))]
+    groups = [("scored", scored, list(XEMA_VARIABLES))]
     if wide and not scored_only:
-        groups.append((wide, [XEMA_SNOW_DEPTH_VAR]))
+        groups.append(("wide", wide, [XEMA_SNOW_DEPTH_VAR]))
 
     total = 0
-    for codes, variables in groups:
-        for start_iso, end_iso, label in chunks:
+    for group, codes, variables in groups:
+        if not codes or not variables:
+            continue  # an empty group would build an invalid `IN ()` query
+        for start_iso, end_iso, month in chunks:
+            # the group is part of the archive label: scored and wide run the
+            # same month with the same fetch timestamp, so without it their raw
+            # pages would collide and one would overwrite the other
             written = backfill_chunk(
                 archive, conn, codes, variables, start_iso, end_iso,
-                label, session, now_utc, fetch_page,
+                f"{month}_{group}", session, now_utc, fetch_page,
             )
             total += written
-            print(f"  {label} [{len(codes)} st × {len(variables)} var]: {written} rows")
+            print(f"  {month} {group} [{len(codes)} st × {len(variables)} var]: {written} rows")
     return total
 
 
@@ -138,10 +147,14 @@ def main(argv: list[str]) -> int:
         print(__doc__, file=sys.stderr)
         return 2
     start, end = args
+    try:
+        chunks = month_chunks(start, end)
+    except ValueError as exc:
+        print(f"bad month range {start!r}..{end!r} (expected YYYY-MM): {exc}", file=sys.stderr)
+        return 2
     now_utc = datetime.now(timezone.utc)
     archive = Archive.from_env()
     conn = store.connect(archive.root / "verification.sqlite")
-    chunks = month_chunks(start, end)
     with make_session() as session:
         total = backfill(archive, conn, chunks, session, now_utc, scored_only)
     print(f"backfill {start}..{end}: {total} rows upserted into {archive.root}")
