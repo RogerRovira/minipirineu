@@ -125,3 +125,68 @@ METEOCAT_ANCHOR_COORDS: dict[str, tuple[float, float]] = {
     "246d5775": (42.4529432, 0.8792261),  # Pica de Cerví
     "4d04de5e": (42.3205751, 1.8926609),  # La Tosa d'Alp
 }
+
+
+# --- XEMA verification truth (S0.3/T5) --------------------------------------
+#
+# Ground-truth observations for scoring the forecasts, pulled quota-free from
+# the Socrata open-data dataset `nzvn-apee` (semi-hourly XEMA readings). The
+# station set and every variable/timestamp semantic below were resolved by a
+# live probe on 2026-07-18; see docs/notes/xema-truth-stations.md.
+
+# XEMA variable codes → storage slug. Stored as `obs.<slug>`. Var 9 (listed in
+# an early roadmap draft) does NOT exist in XEMA's variable metadata and is
+# dropped. Snow depth (38) is the fresh-snow truth driver; the rest feed the
+# phase/undercatch gates (T6/T7) and the band-temperature check.
+XEMA_VARIABLES: dict[str, str] = {
+    "30": "vent_velocitat",  # 10 m wind speed [m/s]  (VV10)
+    "31": "vent_direccio",   # 10 m wind direction [°] (DV10)
+    "50": "vent_ratxa",      # 10 m wind gust [m/s]   (VVx10)
+    "34": "pressio",         # atmospheric pressure [hPa] (P)
+    "36": "irradiancia",     # global solar irradiance [W/m²] (RS)
+    "32": "temperatura",     # air temperature [°C]   (T)
+    "33": "humitat",         # relative humidity [%]  (HR)
+    "35": "precipitacio",    # precipitation [mm]     (PPT)
+    "38": "gruix_neu",       # snow depth on ground [cm] (GNEU) — truth driver
+}
+XEMA_SNOW_DEPTH_VAR = "38"
+
+
+@dataclass(frozen=True)
+class XemaStation:
+    codi: str          # codi_estacio in the open data (its natural key)
+    name: str
+    altitude_m: int
+    role: str          # "high" (near/above resort top) | "valley" (base town)
+    resort: str | None  # resort id this station scores; None = archive-only
+    snow_truth: bool   # its var-38 series is a SCORED fresh-snow truth
+
+
+# Scored truth: two-to-three stations per resort (a high massif station and a
+# valley one), plus the extra high-altitude snow-depth EMAs we archive but do
+# NOT score ("archive wide, publish narrow"). All codes are backfilled; only
+# `resort is not None` stations are scored, and only `snow_truth` var-38 series
+# are the fresh-snow reference.
+#
+# La Molina's high snow-depth truth is Z9 Cadí Nord, not ZD la Tosa d'Alp: ZD
+# sits at the resort but serves no var 38, which is exactly why the user added
+# Cadí Nord on 2026-07-17. ZD is still scored for temperature/wind.
+XEMA_STATIONS: tuple[XemaStation, ...] = (
+    # Baqueira
+    XemaStation("Z1", "Bonaigua", 2262, "high", "baqueira", True),
+    XemaStation("YN", "Vielha - Elipòrt", 1029, "valley", "baqueira", False),
+    # Boí Taüll
+    XemaStation("Z2", "Boí", 2537, "high", "boi-taull", True),
+    XemaStation("CT", "el Pont de Suert", 824, "valley", "boi-taull", False),
+    # La Molina
+    XemaStation("Z9", "Cadí Nord - Prat d'Aguiló", 2145, "high", "la-molina", True),
+    XemaStation("ZD", "la Tosa d'Alp", 2478, "high", "la-molina", False),
+    XemaStation("DP", "Das - Aeròdrom", 1096, "valley", "la-molina", False),
+    # Archive-wide: high Pyrenees EMAs reporting snow depth, near the resorts.
+    # Backfilled for var 38 only; available if the truth set ever needs them.
+    XemaStation("Z3", "Malniu", 2229, "high", None, False),
+    XemaStation("Z5", "Certascan", 2398, "high", None, False),
+    XemaStation("Z7", "Espot", 2519, "high", None, False),
+    XemaStation("ZE", "el Port del Comte", 2288, "high", None, False),
+    XemaStation("DG", "Núria", 1971, "high", None, False),
+)
