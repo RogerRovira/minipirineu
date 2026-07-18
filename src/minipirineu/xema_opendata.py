@@ -16,6 +16,7 @@ parser is testable against recorded fixtures without network access.
 """
 
 import json
+import math
 import os
 
 import requests
@@ -26,6 +27,7 @@ from minipirineu.store import Row
 DATASET = "nzvn-apee"
 SOQL_URL = f"https://analisi.transparenciacatalunya.cat/resource/{DATASET}.json"
 SOURCE = "xema"
+BASE_SEMIHOURLY = "SH"  # the semi-hourly base; see build_query
 # Socrata caps a page at 50000 rows; an app token only raises throttling limits.
 PAGE_LIMIT = 50000
 APP_TOKEN_ENV = "SOCRATA_APP_TOKEN"
@@ -53,10 +55,19 @@ def build_query(
 
     The window is half-open on purpose: adjacent month chunks share no reading,
     so a backfill can't double-store a boundary timestamp.
+
+    Filtered to the semi-hourly base (`codi_base = 'SH'`): the dataset also
+    carries an hourly base (`HO`) and a few corrupt base values, and our store
+    key does not include the base — so without this filter two readings for the
+    same station/variable/instant could collapse into one. All 12 configured
+    stations are SH-only across the full 2009→ history (probe 2026-07-18), so
+    this drops nothing real while making the single-row-per-instant contract
+    structural instead of coincidental.
     """
     where = (
         f"codi_estacio in ({_in_list(station_codes)}) "
         f"and codi_variable in ({_in_list(variable_codes)}) "
+        f"and codi_base = '{BASE_SEMIHOURLY}' "
         f"and data_lectura >= '{start_iso}' and data_lectura < '{end_iso}'"
     )
     return {
@@ -95,13 +106,19 @@ def normalize_timestamp(data_lectura: str) -> str:
 
 def _as_float(value) -> float | None:
     """Missing stays missing: blanks and non-numeric readings become None,
-    never 0 — a fabricated 0 cm of snow would be a false observation."""
+    never 0 — a fabricated 0 cm of snow would be a false observation.
+
+    Non-finite values (`"NaN"`, `"inf"`) parse as floats but are not real
+    readings and, worse, poison the store: NaN != NaN would break the
+    idempotent upsert's value comparison. They collapse to None too.
+    """
     if value is None or value == "":
         return None
     try:
-        return float(value)
+        parsed = float(value)
     except (TypeError, ValueError):
         return None
+    return parsed if math.isfinite(parsed) else None
 
 
 def parse_rows(json_rows, variables: dict = XEMA_VARIABLES) -> list[Row]:
@@ -116,14 +133,16 @@ def parse_rows(json_rows, variables: dict = XEMA_VARIABLES) -> list[Row]:
         slug = variables.get(str(obs.get("codi_variable")))
         if slug is None:
             continue
+        station = obs.get("codi_estacio")
         valid = obs.get("data_lectura")
-        if not valid:
-            continue  # never fabricate a timestamp
+        if not station or not valid:
+            continue  # a row missing its station or timestamp is unusable, not
+            #            a crash — one malformed record can't sink a backfill
         ts = normalize_timestamp(valid)
         rows.append(
             Row(
                 source=SOURCE,
-                station=obs["codi_estacio"],
+                station=station,
                 run_time_utc=ts,
                 valid_time_utc=ts,
                 variable=f"obs.{slug}",
