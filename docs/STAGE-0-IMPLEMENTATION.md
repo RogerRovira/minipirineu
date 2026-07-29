@@ -201,6 +201,20 @@ test on the T6 storm.
 **Done when**: truth series for 2 winters materializes into the store with exclusion
 stats summarized (a sanity report: % excluded per station/winter). **Effort**: 1.5 sessions.
 
+**T7 status (2026-07-29)**: code + gates + merge landed (`src/minipirineu/truth_b.py`,
+config coefficients, `tests/test_truth_b.py` (26) + `tests/test_truth_b_golden.py` (3)
+over a recorded real storm `xema_wide_z9_20250309.json`). ADR-0004 extended with the
+concrete truth-B/gate design and its literature anchors (Kochendorfer 2017,
+Hedstrom & Pomeroy 1998, Li & Pomeroy 1997). **Design change vs the plan**: the wind
+gate keys on **mean 10 m wind (var 30), not gust (var 50)** — the Z9 golden proved
+gust-max gating discards 58 % of buckets and mislabels melt buckets as wind (see the
+T7 note in ADR-0004). Z9 Cadí Nord is the only scored high station with precip+wind
+(Z1/Z2 report neither), so it is the sole full A/B golden; Z1's snowfall stays
+truth-A-only, merged as `unconfirmed`. **Still open** (shared with the T5 tail): the
+multi-winter backfill into the datastore branch materializes truth for ≥2 winters and
+produces the per-station exclusion-rate report — needs the cm-era (2022→) window to
+dodge the var-38 mm→cm unit break.
+
 ## T8 — `verify.py` metric engine (S0.5)
 
 **Goal**: one scoring path for backtest and live.

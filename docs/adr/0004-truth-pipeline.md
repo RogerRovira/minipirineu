@@ -1,9 +1,10 @@
 # ADR 0004 — Pipeline de verdad (truth-A / truth-B, gates, banda muerta)
 
-Estado: aceptada (2026-07-18). Concreta la "truth pipeline" del roadmap
-(`docs/ROADMAP.md` §1) que el gate de verificación (ADR-0003) da por supuesta.
-truth-A se implementa en T6 (`src/minipirineu/truth.py`); truth-B y los gates
-de calidad aterrizan en T7 sobre este mismo diseño.
+Estado: aceptada (2026-07-18; ampliada 2026-07-29 con el diseño concreto de
+truth-B y los gates al implementarse T7). Concreta la "truth pipeline" del
+roadmap (`docs/ROADMAP.md` §1) que el gate de verificación (ADR-0003) da por
+supuesta. truth-A se implementa en T6 (`src/minipirineu/truth.py`); truth-B, los
+gates de calidad y el merge A/B en T7 (`src/minipirineu/truth_b.py`).
 
 ## Problema
 
@@ -73,16 +74,69 @@ caída ya se está asentando mientras se acumula. Los incrementos crudos de HS
    en UTC; los buckets locales de `aggregate.to_buckets` son de presentación del
    sitio, otra cosa. T8/T9 deben usar estos mismos bordes UTC.*
 
-### truth-B y gates (diseño; se implementan en T7)
+### truth-B — verdad independiente desde el pluviómetro (implementada en T7)
 
-- **truth-B** = pluviómetro calefactado (var 35) con transferencia de undercatch
-  WMO-SPICE (Kochendorfer et al. 2020) usando viento a 10 m (var 30), dividido
-  por densidad de nieve fresca parametrizada (baseline **68 ± 9 kg/m³**,
-  Helfricht et al. 2018; dependiente de T/viento). Verdad independiente de A.
-- **Gates de calidad**: A y B divergen mucho → bucket excluido; ráfaga (var 50)
-  > umbral (6–8 m/s, config) → excluido (la redistribución por viento domina
-  ΔHS); firma de fusión (T>0 °C, HS bajando, pluviómetro acumulando) → flag
-  `phase_only`, cm como cota inferior. Missing sigue siendo missing.
+Del pluviómetro calefactado (var 35, mm) a nieve fresca (cm), en tres pasos:
+
+1. **Undercatch WMO-SPICE**, función de transferencia universal de
+   **Kochendorfer et al. (2017)** para pluviómetro **sin apantallar**:
+   `CE = exp(−a·U·(1 − atan(b·T) + c))`, con `U` = viento a altura del
+   pluviómetro y `T` = temperatura del aire. `a=0.0785, b=0.729, c=0.407`.
+   El viento XEMA es a 10 m (var 30): se reduce a altura de pluviómetro (~2 m)
+   con un perfil logarítmico (`WIND_10M_TO_GAUGE≈0.767`, z0≈0.01 m) y se capa a
+   la banda de ajuste SPICE (~7.2 m/s) — por encima el gate de viento ya excluyó
+   el bucket. `precip_ajustada = gauge / CE`, con suelo en CE para que 1/CE no
+   se dispare. CE=1 sin viento; frío y viento la bajan.
+2. **Fracción sólida** (split nieve/lluvia grueso, **independiente** del taper
+   del forecast; la fase fina es Stage 1/S1.1): rampa lineal 1→0 entre
+   `TRUTHB_SNOW_ALL_T_C=0.5` y `TRUTHB_RAIN_ALL_T_C=2.0 °C` de T del aire.
+3. **Densidad de nieve fresca** `ρ(T) = 67.9 + 51.3·exp(T/2.6)` kg/m³
+   (**Hedstrom & Pomeroy 1998**). Su asíntota fría D0=67.9 **coincide** con la
+   media de alta montaña de Helfricht et al. (2018), 68 ± 9 — porque la nieve
+   nueva de alta cota cae fría. `cm = SWE_mm · 100 / ρ`, ρ acotada a
+   [50, 200] kg/m³. Esto ata la densidad de truth-B a la misma fuente que el
+   asentamiento de truth-A. La dependencia de viento (densificación por
+   ventisca) se deja fuera: los buckets con viento sostenido caen antes en el
+   gate de viento, así que rara vez llegan a truth-B.
+
+Coeficientes en `config.py` (no hardcodeados), reafinables contra tormentas sin
+tocar el algoritmo.
+
+### Gates de calidad y merge A/B (T7)
+
+El merge reporta el cm de **truth-A** (medida directa de nieve) y usa truth-B
+para validarlo, en este orden por bucket:
+
+1. **Gate de viento** → `excluded="wind"`. Se puertea con el **viento MEDIO a
+   10 m (var 30) > `GATE_WIND_MEAN_MS=6.0`**, no con la ráfaga (var 50). El
+   viento sostenido redistribuye la nieve (la sopla fuera del ultrasonido y
+   pasa/entra del pluviómetro) → tanto ΔHS como la captura del gauge dejan de
+   medir la caída real. 6 m/s es el umbral de inicio de ventisca de nieve seca
+   (Li & Pomeroy 1997), dentro de la banda 6–8 del roadmap; conservador a
+   propósito (la verificación prefiere pocos buckets limpios). **Corrección
+   empírica frente al diseño previo (que decía "ráfaga var 50 > 6–8 m/s")**: la
+   tormenta ventosa de Cadí Nord (Z9, 2025-03-09; golden de T7) mostró que
+   puertear por la ráfaga máxima descarta el 58 % de los buckets — una sola
+   ráfaga hunde un bucket de 6 h por lo demás en calma — y **mal-etiqueta como
+   viento buckets que son de fusión**. La ráfaga se conserva como diagnóstico en
+   `BucketB.gust_max_ms` pero no puertea.
+2. **Firma de fusión / lluvia-sobre-nieve** (T>0 °C, HS bajando, pluviómetro
+   acumulando) → flag `phase_only`, sin excluir. En fusión A y B *deben*
+   discrepar (A≈0 mientras el gauge acumula), así que se salta el gate de
+   divergencia; el cm es cota inferior y el bucket sólo es puntuable por fase
+   (T8 manda los pares `phase_only` a métricas de evento, no a MAE de cm).
+3. **Gate de divergencia A/B** → `excluded="ab_divergence"` si
+   `|A−B| > max(GATE_AB_ABS_CM=3, GATE_AB_FRAC=0.6·max(A,B))`. Generoso porque
+   ambos métodos cargan incertidumbre real; caza sólo conflictos gruesos (sonda
+   rimada que suelta un catch-up, gauge congelado, ventisca).
+4. Si sólo hay A (p. ej. Z1 sin viento) → `method="A"`, flag `unconfirmed`. Si
+   sólo hay B (hueco en la sonda de nieve) → `method="B"`, flag `gauge_only`.
+   Si no hay ninguno → `excluded="incomplete"`. **Missing sigue siendo
+   missing**: nunca un 0 fabricado.
+
+`exclusion_stats()` resume la disposición por bucket (% excluido por
+estación/invierno — criterio de aceptación de T7).
+
 - **Banda muerta** (definida en ADR-0003, aplicada por `verify.py` en T8):
   `|error| ≤ max(2 cm, 20 % de obs)` cuenta como acierto — no se persigue el
   ruido de sensor (±1–2 cm).
@@ -96,7 +150,18 @@ caída ya se está asentando mientras se acumula. Los incrementos crudos de HS
   de dos capas sobre HS automático sub-diario, densidad de nieve nueva
   68 ± 9 kg/m³, corrección de asentamiento ≈ 13 %. Es el caso exacto (HS
   automático de alta montaña → nieve nueva) del que sale este diseño.
-- **Kochendorfer, J. et al. (2020)**, WMO-SPICE — undercatch para truth-B (T7).
+- **Kochendorfer, J. et al. (2017)**, *The quantification and correction of
+  wind-induced precipitation measurement errors*, HESS 21, 1973 — función de
+  transferencia universal WMO-SPICE del undercatch (coef. a/b/c del pluviómetro
+  sin apantallar), consolidada en Kochendorfer et al. (2020). Base de truth-B.
+- **Hedstrom, N. R. & Pomeroy, J. W. (1998)**, *Measurements and modelling of
+  snow interception in the boreal forest*, Hydrol. Process. 12, 1611 —
+  parametrización de densidad de nieve fresca `ρ(T)=67.9+51.3·exp(T/2.6)`; su
+  asíntota fría 67.9 kg/m³ ancla la densidad de truth-B en el mismo 68 ± 9 de
+  Helfricht.
+- **Li, L. & Pomeroy, J. W. (1997)**, *Estimates of threshold wind speeds for
+  snow transport…*, J. Appl. Meteorol. 36, 205 — umbral de inicio de ventisca
+  (~6–7 m/s en nieve seca) del gate de viento.
 
 ## Simplificaciones asumidas (y por qué son aceptables)
 
