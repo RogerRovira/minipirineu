@@ -232,6 +232,23 @@ phase_only pairs excluded from cm metrics but present in event metrics.
 **Done when**: green; a one-command run scores any date range in the store.
 **Effort**: 1–1.5 sessions.
 
+**T8 status (2026-07-29)**: `src/minipirineu/verify.py` landed — pure metric engine
+(`bucket_metrics`, `group_metrics`, `daily_totals`, `snow_day_metrics`, `verify_report`,
+`to_json`/`to_markdown`) + store-facing `build_pairs` + a one-command CLI
+(`python -m minipirineu.verify START END [--out-json --out-md]`, store at
+`$MINIPIRINEU_DATA_DIR/verification.sqlite`). `tests/test_verify.py` (13) pins exact
+scores (perfect / +2 bias / all-miss / all-false-alarm), both dead-band edges (2 cm and
+20 %), phase_only routed to events-only, daily-total completeness, and a store
+round-trip against real T7 truth. Verified end to end on the Z9 storm + synthetic
+columns (perfect column scores 1.0; +2 bias → FAR 0.75 from over-threshold no-snow
+buckets). **Store convention defined here (T9/T11 must follow)**: forecast snowfall rows
+are `variable = fx.snowfall_cm.<column>`, `station` = XEMA truth-station code,
+`valid_time` = 6 h bucket start; source-agnostic so one query pulls every column.
+**Scope note**: only **24 h** (UTC-day) totals are implemented; 48 h and true per-lead
+totals wait for T9/T10, where the run structure that makes a "48 h lead" meaningful
+actually exists (a live 6 h cron has no such structure). Excluded/None truth drops the
+pair; phase_only feeds events, not cm.
+
 ## T9 — Previous Runs probe + backtest fetch (S0.6a)
 
 **Goal**: the forecast side of the baseline, archived.

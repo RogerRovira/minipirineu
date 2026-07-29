@@ -300,3 +300,18 @@ GATE_AB_FRAC = 0.6
 # still catching. cm becomes a lower bound and the bucket is phase-scorable only
 # (verify.py routes phase_only pairs to event metrics, not cm MAE).
 GATE_MELT_T_C = 0.0
+
+
+# --- verify.py metric engine (S0.5/T8) --------------------------------------
+#
+# One scoring path for backtest (T10) and live (T11) — the same code, no
+# knowledge of which (ADR-0003). Metric spec: docs/ROADMAP.md §1.
+
+# Dead band (ADR-0003): a forecast this close to the obs counts as a hit — the
+# ±1–2 cm sensor floor is not chased. Hit iff |fx − obs| ≤ max(abs, frac·obs).
+DEAD_BAND_ABS_CM = 2.0
+DEAD_BAND_FRAC = 0.20
+# Event thresholds: a 6 h bucket is a "snow event" at/above EVENT_BUCKET_CM; a
+# "snow day" is ≥ SNOW_DAY_CM over 24 h (roadmap §1).
+EVENT_BUCKET_CM = 1.0
+SNOW_DAY_CM = 1.0
