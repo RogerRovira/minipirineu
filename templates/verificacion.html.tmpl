@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MiniPiriNeu — ¿cuánto nos equivocamos?</title>
+<link rel="stylesheet" href="style.css">
+<style>
+  .verif-tables section { margin: 1.5rem 0; }
+  .verif-tables th, .verif-tables td { text-align: right; padding: 0.25rem 0.5rem; }
+  .verif-tables th.col, .verif-tables td.col { text-align: left; font-weight: 600; }
+  .verif-tables td.live, .verif-tables th.live { color: #1a6; }
+  .verif-tables thead th { border-bottom: 1px solid #ccc; }
+  .legend { font-size: 0.85rem; color: #666; }
+  .placeholder { color: #999; font-style: italic; }
+</style>
+</head>
+<body>
+<header>
+  <h1>MiniPiriNeu · ¿cuánto nos equivocamos?</h1>
+  <p class="subtitle">Verificación de la nieve prevista contra la nieve observada
+     (XEMA). El mismo motor de métricas puntúa el baseline congelado pre-invierno
+     y las cifras live — así se comparan manzanas con manzanas.</p>
+  <div class="sources">
+    <span class="badge">Baseline congelado: $baseline_label</span>
+    <span class="badge">Live (trailing): $live_label</span>
+  </div>
+  <p class="legend">Por columna: <strong>base</strong> = baseline congelado
+     (lead 24 h, ~1.5 inviernos); <strong>live</strong> = ventana reciente.
+     MAE/sesgo en cm; POD/FAR/CSI de evento (≥ 1 cm). Un guion «—» = sin datos
+     (nunca se rellena con 0).</p>
+</header>
+<main class="verif-tables">
+$tables_html
+</main>
+<footer>
+  <p>Modelos AROME de Météo-France vía <a href="https://open-meteo.com/">Open-Meteo</a>,
+     bajo licencia <a href="https://creativecommons.org/licenses/by/4.0/">CC-BY 4.0</a>.
+     Verdad observada: estaciones automáticas <a href="https://www.meteo.cat/">XEMA</a>
+     del Servei Meteorològic de Catalunya (Meteocat), open data
+     <a href="https://analisi.transparenciacatalunya.cat/">Dades Obertes de la Generalitat</a>.</p>
+  <p>Página generada el $generated_label. <a href="index.html">← previsión a 48 h</a></p>
+</footer>
+</body>
+</html>
