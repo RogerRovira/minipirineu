@@ -17,7 +17,6 @@ then asserts every API reading matches the open-data value and timestamp at the
 same instant. Prints a PASS/FAIL line per pair; exits non-zero on any mismatch.
 """
 
-import json
 import os
 import sys
 from datetime import date, timedelta
@@ -25,14 +24,10 @@ from pathlib import Path
 
 import requests
 
-from minipirineu import xema_opendata
+from minipirineu import xema_api, xema_opendata
 from minipirineu.config import XEMA_VARIABLES
 from minipirineu.envfile import load_env
 
-# meteo.cat XEMA API — measured data for one variable across stations, filtered
-# to one station, for a given day. Path per the official "XEMA / Dades" docs;
-# if your subscription exposes a different route, adjust here.
-API = "https://api.meteo.cat/xema/v1/variables/mesurades/{var}/{y}/{m:02d}/{d:02d}"
 FIXTURE_DIR = Path("tests/fixtures/xema_api")
 
 # A winter day with snow on the ground at both massif stations (see the
@@ -42,27 +37,10 @@ VARIABLES = ["38", "32", "35"]  # snow depth, temperature, precipitation
 DAY = date(2026, 2, 1)
 
 
-def api_day(session, var, codi):
-    url = API.format(var=var, y=DAY.year, m=DAY.month, d=DAY.day)
-    resp = session.get(url, params={"codiEstacio": codi}, timeout=30)
-    if resp.status_code != 200:
-        raise RuntimeError(f"HTTP {resp.status_code} for {url}?codiEstacio={codi}: {resp.text[:200]}")
-    return resp.content
-
-
-def api_readings(raw: bytes, codi: str) -> dict[str, float | None]:
-    """{ISO-UTC timestamp: valor} from the API payload for one station."""
-    body = json.loads(raw)
-    entries = body if isinstance(body, list) else [body]
-    out: dict[str, float | None] = {}
-    for entry in entries:
-        if entry.get("codi") not in (codi, None):
-            continue
-        for lect in entry.get("variables", [{}])[0].get("lectures", entry.get("lectures", [])):
-            ts = lect.get("data", "").replace(".000Z", "Z").replace("+00:00", "Z")
-            valor = lect.get("valor")
-            out[ts] = None if valor is None else float(valor)
-    return out
+def api_readings(raw: bytes, codi: str) -> dict[str, float]:
+    """{ISO-UTC timestamp: valor} from the API payload for one station, using the
+    same parser the live ingest uses (xema_api) so parity tests real code."""
+    return {r.valid_time_utc: r.value for r in xema_api.parse_station(raw, codi)}
 
 
 def opendata_readings(session, var, codi) -> dict[str, float | None]:
@@ -80,8 +58,7 @@ def main() -> int:
         print("METEOCAT_API_KEY not set (.env or export it)", file=sys.stderr)
         return 2
     FIXTURE_DIR.mkdir(parents=True, exist_ok=True)
-    api = requests.Session()
-    api.headers["X-Api-Key"] = key
+    api = xema_api.make_session()
     od = requests.Session()
 
     ok = True
@@ -89,8 +66,8 @@ def main() -> int:
         for var in VARIABLES:
             slug = XEMA_VARIABLES[var]
             try:
-                raw = api_day(api, var, codi)
-            except RuntimeError as exc:
+                raw = xema_api.fetch(api, var, DAY, codi=codi, timeout=30)
+            except requests.HTTPError as exc:
                 print(f"SKIP {codi}/{slug}: {exc}")
                 continue
             (FIXTURE_DIR / f"{codi}_{var}_{DAY:%Y%m%d}.json").write_bytes(raw)
