@@ -106,6 +106,42 @@ def test_daily_totals_sum_complete_days_only():
     assert totals[0].truth_cm == 2.0
 
 
+def test_daily_totals_by_date_groups_fixed_lead_buckets_across_runs():
+    # the backtest shape: each 6 h bucket of a UTC day comes from its own run
+    # (run = valid − 24 h), so no run covers the whole day.
+    hours = ("00", "06", "12", "18")
+    pairs = [_pair(1, 1, run=f"2025-03-08T{h}:00:00Z", valid=f"2025-03-09T{h}:00:00Z")
+             for h in hours]
+    # "run" grouping (live default) finds no complete day — 4 distinct runs
+    assert verify.daily_totals(pairs, daily_by="run") == []
+    # "date" grouping sums the calendar day regardless of run
+    totals = verify.daily_totals(pairs, daily_by="date")
+    assert len(totals) == 1
+    assert totals[0].forecast_cm == 4.0 and totals[0].truth_cm == 4.0
+    assert totals[0].date_utc == "2025-03-09"
+
+
+def test_daily_totals_by_date_dedups_buckets_across_runs():
+    # a live/multi-run store scored with daily_by="date": a valid bucket covered
+    # by more than one run must count once, never double the day.
+    hours = ("00", "06", "12", "18")
+    day = [_pair(1, 1, run=f"2025-03-08T{h}:00:00Z", valid=f"2025-03-09T{h}:00:00Z")
+           for h in hours]
+    # a genuine 4-bucket day + a duplicate 00Z from an older run → still one day,
+    # 00Z counted once (the old count-the-list code saw 5 pairs and dropped it)
+    totals = verify.daily_totals(
+        day + [_pair(1, 1, run="2025-03-07T00:00:00Z", valid="2025-03-09T00:00:00Z")],
+        daily_by="date")
+    assert len(totals) == 1 and totals[0].forecast_cm == 4.0
+    # the corruption the fix prevents: 2 valid buckets each covered by 2 runs =
+    # 4 pairs. The old code counted 4 pairs as a complete day and double-summed;
+    # now the day has only 2 distinct buckets → not complete → dropped.
+    two = [_pair(3, 3, run=r, valid=v)
+           for v in ("2025-03-09T00:00:00Z", "2025-03-09T06:00:00Z")
+           for r in ("2025-03-08T00:00:00Z", "2025-03-07T00:00:00Z")]
+    assert verify.daily_totals(two, daily_by="date") == []
+
+
 def test_snow_day_metrics_flag_a_day():
     totals = verify.daily_totals(_day([2, 1, 1, 0], [3, 0, 0, 0]))  # 4 cm fx, 3 cm obs
     m = verify.snow_day_metrics(totals)[("arome_hd",)]

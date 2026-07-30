@@ -137,17 +137,32 @@ def group_metrics(pairs, dims: tuple[str, ...], event_cm: float = EVENT_BUCKET_C
 
 # --- 24 h totals + snow-day events ------------------------------------------
 
-def daily_totals(pairs, buckets_per_day: int = 4) -> list[DayTotal]:
-    """Sum forecast and truth over each UTC calendar day, per (column, station,
-    run). A day is scored only when all `buckets_per_day` 6 h buckets are present
-    for that run — an incomplete day is missing, never a partial total."""
-    groups: dict[tuple, list] = defaultdict(list)
+def daily_totals(pairs, buckets_per_day: int = 4, *, daily_by: str = "run") -> list[DayTotal]:
+    """Sum forecast and truth over each UTC calendar day. A day is scored only
+    when all `buckets_per_day` 6 h buckets are present — an incomplete day is
+    missing, never a partial total.
+
+    `daily_by` selects what a "day" groups on:
+      - "run" (live loop, default): buckets sharing one forecast run, which
+        covers the day at increasing leads — the structure a 6 h cron produces.
+      - "date" (fixed-lead backtest): all buckets of a UTC calendar day
+        regardless of run. The Previous-Runs reconstruction gives each 6 h
+        bucket a distinct run (valid − 24 h), so a day never shares one run and
+        "run" grouping would score zero days (T10 finding).
+    """
+    # Key each day by its distinct 6 h valid buckets, not by a running list: a
+    # bucket covered by more than one run (a live/multi-run store scored with
+    # daily_by="date") then counts once, never doubling the day's total. In "run"
+    # mode each run already has one pair per valid bucket, so this is a no-op.
+    groups: dict[tuple, dict[str, "Pair"]] = defaultdict(dict)
     for p in pairs:
-        groups[(p.column, p.station, p.run_utc, p.valid_bucket_utc[:10])].append(p)
+        run_key = p.run_utc if daily_by == "run" else ""
+        groups[(p.column, p.station, run_key, p.valid_bucket_utc[:10])][p.valid_bucket_utc] = p
     totals: list[DayTotal] = []
-    for (col, st, _run, date), ps in groups.items():
-        if len(ps) != buckets_per_day:
+    for (col, st, _run, date), by_bucket in groups.items():
+        if len(by_bucket) != buckets_per_day:
             continue
+        ps = list(by_bucket.values())
         totals.append(DayTotal(
             col, st, ps[0].resort, date,
             sum(p.forecast_cm for p in ps), sum(p.truth_cm for p in ps),
@@ -170,9 +185,10 @@ def _keyed(grouped: dict) -> dict:
     return {"|".join(str(k) for k in key): val for key, val in grouped.items()}
 
 
-def verify_report(pairs, *, event_cm: float = EVENT_BUCKET_CM) -> dict:
-    """Full machine-readable report over a flat list of Pairs."""
-    days = daily_totals(pairs)
+def verify_report(pairs, *, event_cm: float = EVENT_BUCKET_CM, daily_by: str = "run") -> dict:
+    """Full machine-readable report over a flat list of Pairs. `daily_by` is
+    passed to daily_totals — "date" for the fixed-lead backtest (T10)."""
+    days = daily_totals(pairs, daily_by=daily_by)
     return {
         "n_pairs": len(pairs),
         "columns": sorted({p.column for p in pairs}),
@@ -254,11 +270,15 @@ def main(argv=None) -> int:
     ap.add_argument("end", help="ISO-UTC window end (half-open)")
     ap.add_argument("--out-json", type=Path, help="write the machine report here")
     ap.add_argument("--out-md", type=Path, help="write the human report here")
+    ap.add_argument("--daily-by", choices=("run", "date"), default="run",
+                    help="24 h day grouping: 'run' (live loop) or 'date' "
+                         "(fixed-lead backtest, where each bucket has its own run)")
     args = ap.parse_args(argv)
 
     conn = store.connect(Archive.from_env().root / "verification.sqlite")
     stations = [s.codi for s in XEMA_STATIONS if s.snow_truth]
-    report = verify_report(build_pairs(conn, stations, args.start, args.end))
+    report = verify_report(build_pairs(conn, stations, args.start, args.end),
+                           daily_by=args.daily_by)
     if args.out_json:
         args.out_json.write_text(to_json(report))
     if args.out_md:
