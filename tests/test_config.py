@@ -88,6 +88,14 @@ def test_cadi_nord_is_z9_and_la_molinas_snow_truth():
     assert zd.resort == "la-molina" and not zd.snow_truth
 
 
+def test_xema_stations_have_pyrenees_coordinates():
+    # forecasts are re-fetched at these points (T9), so a wrong coord silently
+    # scores the model at the wrong place; pin them into the Catalan Pyrenees box
+    for s in XEMA_STATIONS:
+        assert 42.1 <= s.latitude <= 42.8, s.codi
+        assert 0.7 <= s.longitude <= 2.2, s.codi
+
+
 def test_archive_wide_stations_are_unscored():
     wide = [s for s in XEMA_STATIONS if s.resort is None]
     assert wide, "expected archive-wide snow-depth EMAs"

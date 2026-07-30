@@ -26,6 +26,10 @@ class ModelSpec:
     #   (AROME HD serves no snowfall in any form — validated 2026-07,
     #   see docs/notes/snowfall-semantics.md).
     snowfall_source: str
+    # Short column id under which this model's snowfall is scored in the
+    # verification store (`fx.snowfall_cm.<column>`, T8/T9). Single source of
+    # truth so backtest (T9) and live (T11) write the same column names.
+    column: str
 
 
 STATIONS: tuple[Station, ...] = (
@@ -55,8 +59,10 @@ STATIONS: tuple[Station, ...] = (
 # AROME models served by Open-Meteo, in display order. The brief requires
 # requesting these explicitly (never best_match).
 MODELS: tuple[ModelSpec, ...] = (
-    ModelSpec("meteofrance_arome_france_hd", "AROME HD 1.3 km", snowfall_source="derived"),
-    ModelSpec("meteofrance_arome_france", "AROME 2.5 km", snowfall_source="native"),
+    ModelSpec("meteofrance_arome_france_hd", "AROME HD 1.3 km",
+              snowfall_source="derived", column="arome_hd"),
+    ModelSpec("meteofrance_arome_france", "AROME 2.5 km",
+              snowfall_source="native", column="arome_25"),
 )
 
 # Derived snowfall (models without native snowfall): cm of snow per mm of
@@ -157,6 +163,9 @@ class XemaStation:
     codi: str          # codi_estacio in the open data (its natural key)
     name: str
     altitude_m: int
+    latitude: float    # from the XEMA metadata dataset yqwd-vj5e (probe 2026-07-29)
+    longitude: float   # forecasts are re-fetched at these points (T9), not at
+    #                    the resort band points — apples to apples with truth.
     role: str          # "high" (near/above resort top) | "valley" (base town)
     resort: str | None  # resort id this station scores; None = archive-only
     snow_truth: bool   # its var-38 series is a SCORED fresh-snow truth
@@ -173,22 +182,22 @@ class XemaStation:
 # Cadí Nord on 2026-07-17. ZD is still scored for temperature/wind.
 XEMA_STATIONS: tuple[XemaStation, ...] = (
     # Baqueira
-    XemaStation("Z1", "Bonaigua", 2262, "high", "baqueira", True),
-    XemaStation("YN", "Vielha - Elipòrt", 1029, "valley", "baqueira", False),
+    XemaStation("Z1", "Bonaigua", 2262, 42.64691, 0.98486, "high", "baqueira", True),
+    XemaStation("YN", "Vielha - Elipòrt", 1029, 42.69737, 0.80197, "valley", "baqueira", False),
     # Boí Taüll
-    XemaStation("Z2", "Boí", 2537, "high", "boi-taull", True),
-    XemaStation("CT", "el Pont de Suert", 824, "valley", "boi-taull", False),
+    XemaStation("Z2", "Boí", 2537, 42.46603, 0.88403, "high", "boi-taull", True),
+    XemaStation("CT", "el Pont de Suert", 824, 42.39809, 0.74364, "valley", "boi-taull", False),
     # La Molina
-    XemaStation("Z9", "Cadí Nord - Prat d'Aguiló", 2145, "high", "la-molina", True),
-    XemaStation("ZD", "la Tosa d'Alp", 2478, "high", "la-molina", False),
-    XemaStation("DP", "Das - Aeròdrom", 1096, "valley", "la-molina", False),
+    XemaStation("Z9", "Cadí Nord - Prat d'Aguiló", 2145, 42.29265, 1.71498, "high", "la-molina", True),
+    XemaStation("ZD", "la Tosa d'Alp", 2478, 42.32213, 1.89716, "high", "la-molina", False),
+    XemaStation("DP", "Das - Aeròdrom", 1096, 42.38603, 1.86639, "valley", "la-molina", False),
     # Archive-wide: high Pyrenees EMAs reporting snow depth, near the resorts.
     # Backfilled for var 38 only; available if the truth set ever needs them.
-    XemaStation("Z3", "Malniu", 2229, "high", None, False),
-    XemaStation("Z5", "Certascan", 2398, "high", None, False),
-    XemaStation("Z7", "Espot", 2519, "high", None, False),
-    XemaStation("ZE", "el Port del Comte", 2288, "high", None, False),
-    XemaStation("DG", "Núria", 1971, "high", None, False),
+    XemaStation("Z3", "Malniu", 2229, 42.46605, 1.77850, "high", None, False),
+    XemaStation("Z5", "Certascan", 2398, 42.70030, 1.27200, "high", None, False),
+    XemaStation("Z7", "Espot", 2519, 42.53410, 1.05474, "high", None, False),
+    XemaStation("ZE", "el Port del Comte", 2288, 42.19084, 1.53213, "high", None, False),
+    XemaStation("DG", "Núria", 1971, 42.39848, 2.15517, "high", None, False),
 )
 
 
@@ -315,3 +324,34 @@ DEAD_BAND_FRAC = 0.20
 # "snow day" is ≥ SNOW_DAY_CM over 24 h (roadmap §1).
 EVENT_BUCKET_CM = 1.0
 SNOW_DAY_CM = 1.0
+
+
+# --- Previous Runs backtest fetch (S0.6a/T9) --------------------------------
+#
+# Forecast side of the frozen baseline: fixed-lead AROME series from the
+# Previous Runs API, re-fetched at XEMA truth-station points and scored by the
+# same verify.py (T8) as the live loop. Findings that fix the parameters below
+# are in docs/notes/previous-runs-coverage.md (probe 2026-07-29).
+
+# Lead (hours) each `_previous_dayN` series is labelled with. AROME serves ONLY
+# previous_day1 (~24 h): previous_day2 (~48 h) is beyond its ~51 h horizon and
+# comes back entirely null (probe 2026-07-29). day2 is kept here so the fetcher
+# is horizon-agnostic — its empty series simply produce no rows for AROME, and a
+# longer-horizon model (ECMWF IFS, S2.3) would populate it.
+PREV_LEAD_H: dict[int, float] = {1: 24.0, 2: 48.0}
+# The lead days actually requested by the backtest backfill. day2 is omitted for
+# AROME (always null); T10 scores a 24 h-lead baseline. Re-add 2 for IFS later.
+BACKTEST_LEAD_DAYS: tuple[int, ...] = (1,)
+
+# Archive floor of the Previous Runs API for AROME previous_day1 (both models),
+# UTC. Before this instant the series is null; the backfill should not request
+# earlier windows (they cost quota and return nothing). Probe 2026-07-29.
+PREVIOUS_RUNS_AROME_START_UTC = "2024-01-19T12:00:00Z"
+
+# Budget guard for the one-off backfill. Open-Meteo weights a call by how much
+# data it returns; we approximate cost in "call units" as
+# ceil(days / CALL_UNIT_DAYS) · n_series and refuse a plan whose total exceeds
+# the cap, so the ~10 000/day non-commercial ceiling is never approached. The
+# real backtest (3 snow-truth stations × ~14 months) is a few hundred units.
+CALL_UNIT_DAYS = 14.0
+BACKTEST_DAILY_CALL_UNIT_CAP = 5000
