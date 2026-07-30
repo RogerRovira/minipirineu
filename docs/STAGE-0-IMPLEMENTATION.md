@@ -201,6 +201,20 @@ test on the T6 storm.
 **Done when**: truth series for 2 winters materializes into the store with exclusion
 stats summarized (a sanity report: % excluded per station/winter). **Effort**: 1.5 sessions.
 
+**T7 status (2026-07-29)**: code + gates + merge landed (`src/minipirineu/truth_b.py`,
+config coefficients, `tests/test_truth_b.py` (26) + `tests/test_truth_b_golden.py` (3)
+over a recorded real storm `xema_wide_z9_20250309.json`). ADR-0004 extended with the
+concrete truth-B/gate design and its literature anchors (Kochendorfer 2017,
+Hedstrom & Pomeroy 1998, Li & Pomeroy 1997). **Design change vs the plan**: the wind
+gate keys on **mean 10 m wind (var 30), not gust (var 50)** — the Z9 golden proved
+gust-max gating discards 58 % of buckets and mislabels melt buckets as wind (see the
+T7 note in ADR-0004). Z9 Cadí Nord is the only scored high station with precip+wind
+(Z1/Z2 report neither), so it is the sole full A/B golden; Z1's snowfall stays
+truth-A-only, merged as `unconfirmed`. **Still open** (shared with the T5 tail): the
+multi-winter backfill into the datastore branch materializes truth for ≥2 winters and
+produces the per-station exclusion-rate report — needs the cm-era (2022→) window to
+dodge the var-38 mm→cm unit break.
+
 ## T8 — `verify.py` metric engine (S0.5)
 
 **Goal**: one scoring path for backtest and live.
@@ -217,6 +231,23 @@ phase_only pairs excluded from cm metrics but present in event metrics.
 
 **Done when**: green; a one-command run scores any date range in the store.
 **Effort**: 1–1.5 sessions.
+
+**T8 status (2026-07-29)**: `src/minipirineu/verify.py` landed — pure metric engine
+(`bucket_metrics`, `group_metrics`, `daily_totals`, `snow_day_metrics`, `verify_report`,
+`to_json`/`to_markdown`) + store-facing `build_pairs` + a one-command CLI
+(`python -m minipirineu.verify START END [--out-json --out-md]`, store at
+`$MINIPIRINEU_DATA_DIR/verification.sqlite`). `tests/test_verify.py` (13) pins exact
+scores (perfect / +2 bias / all-miss / all-false-alarm), both dead-band edges (2 cm and
+20 %), phase_only routed to events-only, daily-total completeness, and a store
+round-trip against real T7 truth. Verified end to end on the Z9 storm + synthetic
+columns (perfect column scores 1.0; +2 bias → FAR 0.75 from over-threshold no-snow
+buckets). **Store convention defined here (T9/T11 must follow)**: forecast snowfall rows
+are `variable = fx.snowfall_cm.<column>`, `station` = XEMA truth-station code,
+`valid_time` = 6 h bucket start; source-agnostic so one query pulls every column.
+**Scope note**: only **24 h** (UTC-day) totals are implemented; 48 h and true per-lead
+totals wait for T9/T10, where the run structure that makes a "48 h lead" meaningful
+actually exists (a live 6 h cron has no such structure). Excluded/None truth drops the
+pair; phase_only feeds events, not cm.
 
 ## T9 — Previous Runs probe + backtest fetch (S0.6a)
 

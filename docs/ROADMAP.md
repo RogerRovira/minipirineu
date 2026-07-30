@@ -136,6 +136,17 @@ ticking), with S0.9 early (cheap, starts the profile history), then S0.3 → S0.
 - **Acceptance**: verification store holds ≥2 winters × ≥6 stations of 30-min series;
   a recorded-fixture test pins the column semantics; re-running backfill changes 0 rows.
 
+**S0.3 status (2026-07-18)**: code + station set + semantics landed
+(`xema_opendata.py`, `ingest_xema.py`, `config.XEMA_STATIONS/XEMA_VARIABLES`,
+tests, `docs/notes/xema-truth-stations.md`). Live probe resolved the open
+questions: `data_lectura` is UTC (solar-peak check), forward-labeled; **Cadí
+Nord = Z9** (La Molina's snow truth, since ZD la Tosa serves no var 38); the
+roadmap's var 9 does not exist and was dropped. Backfill verified end-to-end on
+a real 3-day slice (6762 rows, idempotent re-pull → 0 new). **Still open**: run
+the multi-winter backfill into the datastore branch, and the ~6-call XEMA API
+parity check (`scripts/record_xema_parity.py`, needs the meteo.cat key — its
+fixtures also seed T11).
+
 ### S0.4 Truth pipeline (truth-A / truth-B, gates, dead band)
 - **Mechanism**: as in §1. Settling-correction coefficients from Helfricht et al.
   2018 / SNTHERM-derived equations — taken from the literature and validated on 2–3
