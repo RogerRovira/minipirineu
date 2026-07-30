@@ -16,6 +16,14 @@ fase, correcciones de QPF, blends, SLR…) se despliega sin:
 2. **Baseline congelado**: el informe del backtest pre-invierno (Previous Runs
    API + verdad XEMA, ~2 inviernos) por estación/cota/lead para las dos
    columnas AROME. Se congela por commit y se referencia aquí cuando exista.
+   **Primer baseline (T10, 2026-07-29):** `docs/verification/baseline-2026-07-29.md`
+   (+ `.json`) — lead 24 h, columnas `arome_25`/`arome_hd`, estaciones Z1/Z2/Z9,
+   ~1.5 inviernos (2024-01-19 → 2025-04-30). Hallazgos: la 2.5 nativa bate a la
+   HD derivada en MAE/POD/CSI en todas las ventanas (pt 5); ambas infra-predicen
+   (bias −0.7 cm/6 h, −2.9 cm/día; POD ~0.3; FAR ~0.05). **Congelado en el commit
+   `fd4c035`** (T10/S0.6b) — reproducible desde los raws de la rama `datastore`
+   (`raw/openmeteo_backtest/`, `raw/xema/`). Toda mejora futura del forecast se
+   mide contra estos números.
 3. **Umbral go/no-go explícito y falsable por item** (definidos en el roadmap;
    p. ej. bulbo húmedo: +≥5 puntos de acierto de fase en buckets marginales
    sobre ≥30 eventos sin degradar el MAE de cm más allá de la banda muerta).
