@@ -1,0 +1,58 @@
+# Near-real-time XEMA observations from the meteo.cat API (S0.8/T11d).
+# Decoupled obs feed: writes ONLY the datastore branch (raw archive +
+# verification store), never data/ on main and never Pages. The CLI's staleness
+# gate makes extra slots no-ops, so the quota stays ~600/month of the 750 XEMA
+# plan. Socrata remains the historical truth; this is the recent tail.
+name: xema-api
+
+on:
+  schedule:
+    # 3 slots/day ~8h apart, off-the-hour to dodge scheduled-run congestion.
+    # The 06:xx UTC slot is < 12:00 UTC, so ingest_xema_api also backfills
+    # yesterday (overnight validation). ~20 calls/day across the slots.
+    - cron: "23 6,14,22 * * *"
+  workflow_dispatch:
+
+# Only the datastore branch is written (via the composite actions' token push).
+permissions:
+  contents: write
+
+# One writer at a time on the datastore branch (ADR-0002), shared with the
+# forecast / meteocat / verification workflows.
+concurrency:
+  group: publish
+  cancel-in-progress: false
+
+jobs:
+  ingest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -e .
+
+      - uses: ./.github/actions/datastore-checkout
+
+      # A failed ingest must still preserve whatever raw payloads were archived
+      # before it fell over (archive-before-parse, ADR-0002).
+      - name: Ingest XEMA API observations
+        id: ingest
+        continue-on-error: true
+        env:
+          METEOCAT_API_KEY: ${{ secrets.METEOCAT_API_KEY }}
+          MINIPIRINEU_DATA_DIR: datastore
+        run: python -m minipirineu.ingest_xema_api
+
+      - uses: ./.github/actions/datastore-commit
+        with:
+          message: "xema-api: near-real-time observations"
+
+      # Surface a failure (GitHub emails on a red run) even though the archived
+      # raws were committed above.
+      - name: Fail the run if ingest failed
+        if: steps.ingest.outcome == 'failure'
+        run: |
+          echo "::error::XEMA API ingest failed; any archived raws were still committed"
+          exit 1

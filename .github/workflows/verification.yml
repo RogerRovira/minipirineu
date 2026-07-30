@@ -1,0 +1,95 @@
+# Weekly "how wrong were we" verification page (S0.7/T11d).
+# Refreshes the recent Socrata truth, re-buckets the archived live forecast runs
+# to UTC, scores them with verify.py (T8) against the truth, and republishes the
+# site with the frozen baseline (T10) beside the trailing live scores.
+#
+# Requires (present on main once s03-xema-truth merges): the frozen baseline
+# docs/verification/baseline-*.json and templates/verificacion.html.tmpl. If the
+# live report is missing, the page still renders the baseline with live shown as
+# "—" (missing is missing, never 0).
+name: verification
+
+on:
+  schedule:
+    - cron: "33 5 * * 1" # Mondays ~05:33 UTC, off-the-hour
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+# Serialize with the forecast / meteocat / xema-api workflows: one datastore
+# writer at a time (ADR-0002) and one Pages deploy at a time.
+concurrency:
+  group: publish
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -e .
+
+      - uses: ./.github/actions/datastore-checkout
+
+      # Trailing window = the last ~90 days. Refresh the truth over every month
+      # the window spans (ingest_xema is month-granular, idempotent, quota-free).
+      - name: Refresh Socrata truth (trailing months)
+        id: truth
+        continue-on-error: true
+        env:
+          MINIPIRINEU_DATA_DIR: datastore
+        run: |
+          set -eu
+          START_MONTH=$(date -u -d "90 days ago" +%Y-%m)
+          END_MONTH=$(date -u +%Y-%m)
+          python -m minipirineu.ingest_xema "$START_MONTH" "$END_MONTH" --scored-only
+
+      # Re-bucket the archived live runs to UTC and score them → live_report.json.
+      - name: Build the trailing live report
+        id: live
+        continue-on-error: true
+        env:
+          MINIPIRINEU_DATA_DIR: datastore
+        run: |
+          set -eu
+          START=$(date -u -d "90 days ago" +%Y-%m-%dT00:00:00Z)
+          END=$(date -u -d "tomorrow" +%Y-%m-%dT00:00:00Z)
+          python -m minipirineu.live_forecast "$START" "$END" --out-json live_report.json
+
+      # Persist the refreshed truth (new Socrata raw pages) + the re-bucketed
+      # forecast rows (ADR-0002); the store is a rebuildable view.
+      - uses: ./.github/actions/datastore-commit
+        with:
+          message: "verification: trailing truth refresh + live forecast rows"
+
+      # Rebuild the WHOLE site so the Pages deploy stays complete: index.html
+      # from data/*.json on main, plus the verification page. --live is optional
+      # (a missing report → baseline with live "—").
+      - name: Render site + verification page
+        run: |
+          python -m minipirineu.render
+          python -m minipirineu.render_verification --live live_report.json
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+      # Deploy went out with last-good data, but a failed refresh must show red.
+      - name: Fail the run if a data step failed
+        if: steps.truth.outcome == 'failure' || steps.live.outcome == 'failure'
+        run: |
+          echo "::error::verification refresh failed; page deployed with last-good data"
+          exit 1
