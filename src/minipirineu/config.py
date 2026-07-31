@@ -381,6 +381,13 @@ OPG_PROBED_STATION_ELEVATION_M: dict[tuple[str, str], int | None] = {}
 # would only dilute the metrics the go/no-go threshold is measured on.
 OPG_WET_BUCKET_MM = 0.5
 OPG_WET_BUCKET_CM = 0.5
+# ...and a pair of elevations is only comparable when at least this many of the
+# lower band's steps are non-zero. A total alone is not enough: two DIFFERENT
+# grid cells can serve an identical series through a light spell that is mostly
+# zeros, which is how a saturation verdict gets fabricated from a marginal
+# window (measured: every spurious "identical" run in the archive rested on 1–2
+# non-zero buckets, docs/notes/opg.md §1).
+OPG_MIN_WET_STEPS = 3
 # Go/no-go (ROADMAP §4 S1.3): cm MAE on the affected points must improve by at
 # least this fraction on backtest wet buckets, and the correction must not turn
 # the baseline's under-prediction into over-prediction (bias sign flip).

@@ -94,10 +94,11 @@ class TestScaling:
 # --- detecting saturation from a run ----------------------------------------
 
 class TestDetectReference:
-    WET = [3.0, 3.0]
+    # ≥ OPG_MIN_WET_STEPS non-zero steps, so identity is evidence not coincidence
+    WET = [3.0, 3.0, 3.0]
 
     def test_identical_wet_bands_reveal_a_shared_grid_cell(self):
-        det = opg.detect_reference({1500: [1.0, 1.0], 2000: self.WET, 2600: self.WET})
+        det = opg.detect_reference({1500: [1.0, 1.0, 1.0], 2000: self.WET, 2600: self.WET})
         assert det == opg.Detection(2000, True)
 
     def test_lowest_saturating_band_wins(self):
@@ -105,20 +106,54 @@ class TestDetectReference:
         assert det.reference_m == 1500
 
     def test_a_dry_run_decides_nothing(self):
-        det = opg.detect_reference({1500: [0.0, 0.0], 2000: [0.0, 0.0], 2600: [0.0, 0.0]})
+        det = opg.detect_reference({1500: [0.0] * 3, 2000: [0.0] * 3, 2600: [0.0] * 3})
         assert det == opg.Detection(None, False)
         # ...and therefore writes no diagnostic row and raises no drift alert
         assert opg.reference_rows("baqueira", "2026-01-01T00:00:00Z", {A25: det}) == []
         assert opg.reference_drift("baqueira", A25, det) is None
 
     def test_no_saturation_is_a_real_verdict_when_every_pair_was_wet(self):
-        det = opg.detect_reference({1500: [1.0, 1.0], 2000: [2.0, 2.0], 2600: [3.0, 3.0]})
+        det = opg.detect_reference({1500: [1.0] * 3, 2000: [2.0] * 3, 2600: [3.0] * 3})
         assert det == opg.Detection(None, True)
 
     def test_a_pair_too_dry_to_check_leaves_the_verdict_open(self):
         # the 2000→2600 pair is unreadable, so "no saturation" cannot be claimed
-        det = opg.detect_reference({1500: [3.0, 3.0], 2000: [0.0, 0.0], 2600: [1.0, 0.0]})
+        det = opg.detect_reference({1500: [3.0] * 3, 2000: [0.0] * 3, 2600: [1.0, 0.0, 0.0]})
         assert det == opg.Detection(None, False)
+
+    def test_identity_across_a_mostly_zero_series_proves_nothing(self):
+        """Two DIFFERENT cells match a light spell by coincidence: the totals
+        clear the mm floor, but the agreement rests on one non-zero step."""
+        light = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 2.5]
+        det = opg.detect_reference({2000: light, 2600: light})
+        assert det == opg.Detection(None, False)
+        # the same total spread over enough wet steps does decide
+        spread = [0.5, 0.5, 0.5, 0.5, 0.5, 0.0, 0.0, 0.0]
+        assert opg.detect_reference({2000: spread, 2600: spread}) == opg.Detection(2000, True)
+
+
+class TestBoundOnlyVerdicts:
+    """A ladder that saturates at its lowest rung has only bounded the reference
+    from above — and recording that bound would disable the correction."""
+
+    def test_a_verdict_on_the_lowest_rung_is_only_a_bound(self):
+        det = opg.Detection(2262, True)
+        assert opg.is_bound_only(det, [2262, 2562, 2862])
+
+    def test_a_verdict_above_the_lowest_rung_is_a_measurement(self):
+        det = opg.Detection(2562, True)
+        assert not opg.is_bound_only(det, [2262, 2562, 2862])
+
+    def test_no_saturation_is_never_a_bound(self):
+        assert not opg.is_bound_only(opg.Detection(None, True), [2262, 2562])
+
+    def test_writing_a_bound_would_switch_the_correction_off(self, monkeypatch):
+        """Why the probe refuses to emit one: reference == the point's own
+        elevation computes Δz = 0, i.e. no correction, at a point the ladder
+        just proved is ABOVE its grid cell — the opposite of the finding."""
+        monkeypatch.setitem(config.OPG_PROBED_STATION_ELEVATION_M,
+                            ("Z1", A25), 2262)  # Z1's own altitude
+        assert opg.point_factor("Z1", A25, 2262) == 1.0
 
 
 class TestReferenceDrift:

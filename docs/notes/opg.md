@@ -36,29 +36,40 @@ nada.
 | la-molina | AROME HD | 1700→2100 | 9 | 0 | 9 | 1.053 |
 | la-molina | AROME HD | **2100→2500** | 9 | **9** | 0 | **1.000** |
 
+Un par además solo es **comparable** si la cota inferior tiene ≥ 3 pasos no
+nulos (`OPG_MIN_WET_STEPS`), no solo ≥ 2 mm de total. Motivo medido: en el
+archivo, **todos** los veredictos "idénticos" espurios (los 2 de Boí Taüll)
+descansaban sobre **1–2 buckets no nulos**, mientras que los reales se repiten
+en 5–7 runs. Con series casi todas a cero, que dos celdas *distintas* coincidan
+es barato; con 3+ valores no nulos coincidiendo a 0.1 mm, no.
+
 **Cotas de saturación resultantes** (`config.OPG_REFERENCE_ELEVATION_M`),
-con el acuerdo entre runs decidibles:
+con el acuerdo entre runs decidibles bajo esa regla:
 
 | punto | modelo | referencia | acuerdo |
 |---|---|---|---|
-| baqueira | AROME 2.5 | **2000 m** | 10/10 |
-| baqueira | AROME HD | **2000 m** | 11/11 |
-| boi-taull | AROME 2.5 | sin saturación | 9/10 |
-| boi-taull | AROME HD | sin saturación | 10/11 |
-| la-molina | AROME 2.5 | sin saturación | 9/9 |
-| la-molina | AROME HD | **2100 m** | 9/9 |
+| baqueira | AROME 2.5 | **2000 m** | 7/7 |
+| baqueira | AROME HD | **2000 m** | 5/5 |
+| boi-taull | AROME 2.5 | sin saturación | 3/3 |
+| boi-taull | AROME HD | sin saturación | 6/6 |
+| la-molina | AROME 2.5 | sin saturación | 1/1 |
+| la-molina | AROME HD | **2100 m** | 3/3 |
+
+Con el guard, **todos los puntos son unánimes**: los 2 runs disidentes de Boí
+Taüll eran coincidencias de un bucket. El precio es que los veredictos
+*negativos* ("no satura") exigen que **todos** los pares del run sean
+comparables, así que se apoyan en menos runs (la-molina 2.5: 1). Su evidencia
+ancha sigue siendo la tabla de arriba: 0 idénticos en 14–15 runs mojados.
 
 Esto **confirma el supuesto del roadmap** ("validado: Baqueira 2000 m ≡ 2600 m")
 y lo acota: la saturación **no** es universal — Boí Taüll resuelve celda propia
 en las tres cotas, y La Molina solo satura en HD. La corrección, por tanto,
 afecta hoy a **dos bandas**: baqueira/alta (ambos modelos) y la-molina/alta (HD).
 
-Los dos runs disidentes de Boí Taüll (1 par idéntico de 12) no cambian la
-decisión —la mayoría y ambas cotas contiguas dicen que no satura—, pero quedan
-registrados: si esa proporción crece, la selección de celda de Open-Meteo se
-está moviendo. Por eso cada run vivo guarda su veredicto (`derived.opg_reference_m.<modelo>`
-en el store) y la ingesta **alerta por stderr** si contradice esta tabla —la
-misma disciplina de drift que los anchors de Meteocat.
+Cada run vivo guarda su veredicto (`derived.opg_reference_m.<modelo>` en el
+store) y la ingesta **alerta por stderr** si contradice esta tabla —la misma
+disciplina de drift que los anchors de Meteocat—: si la selección de celda de
+Open-Meteo se mueve, la corrección deja de ser válida y hay que verlo.
 
 ⚠️ Estos 39 runs son de **julio** (convección de verano). La *saturación* es una
 propiedad geométrica de la rejilla (qué celda contesta), no del régimen
@@ -120,8 +131,39 @@ Tratarlo como cota superior del gradiente, no como verdad.
   `opg.resolve_reference` lo marca como `inherited` — un prior explícito, nunca
   una medición disfrazada. Se mide con
   `python scripts/probe_opg_saturation.py --start … --end … --paste`
-  (escalera de cotas sobre el mismo punto, ~4 llamadas gratis por punto) y se
-  pega en `config.OPG_PROBED_STATION_ELEVATION_M`.
+  (escalera de cotas sobre el mismo punto, ~6 llamadas gratis por punto) y se
+  pega en `config.OPG_PROBED_STATION_ELEVATION_M`. **Primer intento el
+  2026-07-31: no sirvió — ver §3.1.**
+
+### 3.1 Primer sondeo (2026-06-02 → 06-04): descartado, y por qué
+
+Escalera **solo hacia arriba** (0/+300/+600/+900 m) sobre la ventana más mojada
+alcanzable (~15–16 mm/modelo). Veredictos: Z1/HD 2262, Z1/2.5 2562, Z2 2537
+(ambos modelos), Z9/HD 2445, Z9/2.5 2145. **No se pegaron al config**, por tres
+razones —ninguna es culpa del sondeo, las tres son de diseño de la escalera:
+
+1. **Todas las referencias caen en la cota de la estación o por encima ⇒ los
+   seis factores dan exactamente 1.000** (comprobado ejecutando el dict contra
+   `opg.point_factor`). O sea: pegarlo **apaga la corrección en todos los puntos
+   puntuados**, no se escribiría ninguna fila `_opg` y `opg gate` respondería
+   "no OPG-affected wet buckets" para las dos columnas. Habría parecido progreso
+   y habría dejado S1.3 sin experimento.
+2. **Tres de los seis veredictos (Z1/HD, Z2 ×2, Z9/2.5) son la cota más baja de
+   la escalera**, es decir, el punto **ya saturaba en su propia altitud**. Eso no
+   es una medición sino una **cota superior**: la celda que responde está más
+   abajo, sin ver. Y es justo el caso en que la corrección *sí* debería actuar
+   (el punto está probadamente por encima de su celda), pero `factor()` calcula
+   Δz = 0 → 1.0. Un "medido" que apaga la corrección es peor que el prior.
+3. **Ventana marginal**: ~15–16 mm en 72 h son mayoritariamente ceros, y ahí la
+   identidad entre series es barata (§1). El sondeo no reportaba cuántas horas
+   no nulas sostenían cada veredicto.
+
+**Arreglado en el código, no en la interpretación**: la escalera ahora baja
+(−900…+600 m), `opg.is_bound_only` detecta un veredicto que solo acota, el probe
+**se niega a emitirlo** (sale con código ≠ 0) e imprime mm/horas-mojadas por
+peldaño para que cada veredicto sea auditable. Repetir el sondeo tras un
+episodio de precipitación real; entonces los veredictos serán Δz > 0 y
+utilizables.
 - **El gradiente invernal**: prior hasta que `opg fit` corra sobre un invierno
   real de la XEMA.
 

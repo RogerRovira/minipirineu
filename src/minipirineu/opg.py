@@ -6,8 +6,8 @@ steers which cell is selected, so once the requested height is above every
 neighbouring cell the same cell answers for every higher band and precipitation
 stops responding to elevation at all. Measured over every committed run of
 `data/openmeteo.json` (`scripts/detect_opg_saturation.py`, docs/notes/opg.md):
-Baqueira's 2000 m and 2600 m bands are precipitation-identical in 10/10 wet runs
-for AROME 2.5 and 11/11 for HD; La Molina's 2100/2500 do the same for HD. Above
+Baqueira's 2000 m and 2600 m bands are precipitation-identical in every decidable
+wet run (7/7 for AROME 2.5, 5/5 for HD); La Molina's 2100/2500 likewise for HD. Above
 that saturation height the model's own resolved elevation gradient (+2.6 %/100 m
 median between its cells) simply stops — which is one concrete, measurable
 source of the frozen baseline's systematic under-prediction (bias −0.73 cm/6 h).
@@ -43,6 +43,7 @@ from minipirineu.config import (
     MODELS,
     OPG_GATE_MIN_MAE_GAIN,
     OPG_MAX_FACTOR,
+    OPG_MIN_WET_STEPS,
     OPG_PER_100M,
     OPG_PROBED_STATION_ELEVATION_M,
     OPG_REFERENCE_ELEVATION_M,
@@ -158,6 +159,7 @@ class Detection:
 def detect_reference(
     precip_by_elevation: dict[int, Sequence[float | None]],
     min_total_mm: float = OPG_WET_BUCKET_MM * 4,
+    min_wet_steps: int = OPG_MIN_WET_STEPS,
 ) -> Detection:
     """Saturation elevation implied by ONE run's per-band precipitation series.
 
@@ -167,6 +169,12 @@ def detect_reference(
     skipped — and a *negative* verdict ("no saturation") is only decidable when
     every pair was wet enough to check: otherwise the run simply never saw the
     band where saturation might start. Undecided is not "no saturation".
+
+    "Wet enough" is BOTH a total and a count of non-zero steps: identity is
+    cheap when two series are almost entirely zeros, and two genuinely different
+    cells can match a light spell by coincidence. Measured on the 39 archived
+    runs, the spurious "identical" verdicts all rested on 1–2 non-zero buckets
+    while the real ones repeat across ten runs (docs/notes/opg.md §1).
     """
     elevations = sorted(precip_by_elevation)
     checked = 0
@@ -174,10 +182,27 @@ def detect_reference(
         lo_series = list(precip_by_elevation[lo])
         if sum(v or 0.0 for v in lo_series) < min_total_mm:
             continue
+        if sum(1 for v in lo_series if v) < min_wet_steps:
+            continue
         checked += 1
         if lo_series == list(precip_by_elevation[hi]):
             return Detection(lo, True)
     return Detection(None, checked == max(len(elevations) - 1, 0) and checked > 0)
+
+
+def is_bound_only(detection: Detection, probed_elevations) -> bool:
+    """True when a verdict sits on the LOWEST elevation looked at.
+
+    Then saturation was already in force at the bottom of the ladder, so all we
+    learned is "the reference is at most this" — the elevation the saturating
+    cell really represents is somewhere below, unseen. Recording such a bound as
+    a reference is worse than recording nothing: `factor()` would compute
+    Δz = 0 at the point itself and silently disable the correction exactly where
+    the point is provably above its grid cell. Probe deeper instead.
+    """
+    elevations = list(probed_elevations)
+    return (detection.reference_m is not None and bool(elevations)
+            and detection.reference_m == min(elevations))
 
 
 def reference_drift(station_id: str, model_id: str, detection: Detection) -> str | None:

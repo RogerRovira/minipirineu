@@ -266,17 +266,21 @@ S0.9 under the ingest-wide decision of 2026-07-17; Stage 1 is what those data en
 (`config.OPG_ENABLED = False`, published output unchanged). `opg.py` +
 `scripts/detect_opg_saturation.py` + `docs/notes/opg.md`. The saturation is now
 measured, not assumed, from the 39 committed runs of `data/openmeteo.json`:
-Baqueira saturates at **2000 m** (both models, 10/10 and 11/11 wet runs),
-La Molina at **2100 m** (HD only), and **Boí Taüll does not saturate at all** —
-so the correction affects two bands, not all high bands. The gradient prior is
+Baqueira saturates at **2000 m** (both models, unanimous over 7 and 5 decidable
+wet runs), La Molina at **2100 m** (HD only), and **Boí Taüll does not saturate
+at all** — so the correction affects two bands, not all high bands. The gradient prior is
 **+3 %/100 m**, bracketed by AROME's own resolved cell-to-cell gradient at these
 points (median +2.64 %/100 m) and the literature/AROME-Pyrenees
 underestimation. Backtest (T9) and live pairing (T11b) now write a
 `<column>_opg` variant beside each plain column, and `python -m minipirineu.opg
 gate` computes the go/no-go verdict. **Still open**: the XEMA verification
-points inherit their resort's saturation elevation until
-`scripts/probe_opg_saturation.py` measures them (their factors are small —
-Z1 ×1.079, Z9 ×1.014, Z2 ×1.000 — so the gate may lack signal before that), and
+points inherit their resort's saturation elevation. The first probe
+(2026-06-02..04) was **rejected, not applied**: an upward-only ladder on a
+marginal window returned references at or above each station's own altitude,
+which computes to factor 1.000 everywhere and would have silently disabled the
+correction (docs/notes/opg.md §3.1). The ladder now reaches below the station
+and refuses bound-only verdicts — re-probe after a real precipitation episode.
+Also still open:
 `python -m minipirineu.opg fit` needs a winter of XEMA gauge data to replace the
 prior (only the Z9/DP pair has gauges at both ends).
 
