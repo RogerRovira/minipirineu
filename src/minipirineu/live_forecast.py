@@ -22,9 +22,9 @@ import sys
 from datetime import datetime, timedelta
 from pathlib import Path
 
-from minipirineu import ingest_openmeteo, openmeteo, previous_runs, store, verify
+from minipirineu import aggregate, ingest_openmeteo, openmeteo, previous_runs, store, verify
 from minipirineu.archive import Archive, run_time_from_path
-from minipirineu.config import MODELS, STATIONS, XEMA_STATIONS
+from minipirineu.config import DERIVED_COLUMNS, MODELS, STATIONS, XEMA_STATIONS
 from minipirineu.store import Row
 from minipirineu.truth import parse_stamp
 
@@ -73,19 +73,32 @@ def raw_to_rows(raw_bytes: bytes, run_time_utc: str, station_code: str) -> list[
     utc_times = _utc_times(parsed["time"], raw.get("utc_offset_seconds", 0))
     run_dt = parse_stamp(run_time_utc)
     rows: list[Row] = []
-    for spec in MODELS:
-        series = parsed["models"][spec.id]
-        try:
-            snow = ingest_openmeteo.snowfall_series(spec, series)
-        except ValueError:
-            continue  # a native model gone all-null → API changed; skip, never 0
-        variable = verify.forecast_variable(spec.column)
+
+    def emit(variable: str, snow: list) -> None:
         for bucket_start, cm in previous_runs.bucketize(utc_times, snow):
             # a bucket starting before the run is analysis/nowcast, not a
             # forecast — scoring it would flatter forecast skill; drop it.
             if parse_stamp(bucket_start) < run_dt:
                 continue
             rows.append(Row(SOURCE, station_code, run_time_utc, bucket_start, variable, cm))
+
+    for spec in MODELS:
+        series = parsed["models"][spec.id]
+        try:
+            snow = ingest_openmeteo.snowfall_series(spec, series)
+        except ValueError:
+            continue  # a native model gone all-null → API changed; skip, never 0
+        emit(verify.forecast_variable(spec.column), snow)
+    # Scored-only challenger columns (S1.1): the archived live raws carry surface
+    # RH (T4), so the wet-bulb column genuinely differs from the T-taper here.
+    # Never rendered — scored beside the published column until it beats baseline.
+    for dc in DERIVED_COLUMNS:
+        series = parsed["models"][dc.from_model]
+        snow = aggregate.derive_column_snowfall(
+            dc.partition, series["precipitation_mm"],
+            series["temperature_c"], series["relative_humidity_pct"],
+        )
+        emit(verify.forecast_variable(dc.column), snow)
     return rows
 
 

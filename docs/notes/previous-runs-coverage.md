@@ -86,6 +86,20 @@ de `precipitation_previous_day1` + `temperature_2m_previous_day1` con
 2.5 sí sirve `snowfall_previous_day1` nativo (verificado con nieve real en la
 fixture: total día1 ≈ 4.0 cm el 2025-02-01 en Z1).
 
+## Hallazgo 4 — la API sirve `relative_humidity_2m` para ambos modelos (S1.1)
+
+Sondeo **2026-07-30**: `relative_humidity_2m_previous_day1` vuelve **poblado
+al 100 %** para los dos modelos AROME (2025-02-01..07: HD 168/168, 2.5 168/168),
+y los valores de HD y 2.5 difieren (p. ej. 69 % vs 78 % en el mismo instante),
+así que la RH de HD es propia, no un eco de 2.5. Esto habilita la columna
+retadora **`arome_hd_wb`** de S1.1 (partición nieve/lluvia por bulbo húmedo de
+Stull, `docs/notes/wetbulb-partition.md`): la derivación es intra-modelo (RH
+propia de HD). Por eso `relative_humidity_2m` se añadió a
+`previous_runs.BASE_VARS` y el backtest se re-descargó; es un no-op para las dos
+columnas de modelo (`arome_hd`/`arome_25`), que no cambian. `previous_day2` de RH
+comparte el límite de horizonte del hallazgo 1 (vacío para AROME), irrelevante
+para el baseline de lead 24 h.
+
 ## Variables y columnas que fija T9
 
 Por estación (a sus coordenadas y elevación XEMA), un run por chunk, `timezone=UTC`:

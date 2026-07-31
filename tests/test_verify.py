@@ -7,9 +7,11 @@ engine has no knowledge of backtest vs live — that symmetry is the point.
 
 import json
 
+import pytest
+
 from minipirineu import store, verify
 from minipirineu.truth import parse_stamp
-from minipirineu.verify import Pair
+from minipirineu.verify import Pair, PhaseItem
 
 
 def _pair(fc, tc, *, column="arome_hd", station="Z9", resort="la-molina",
@@ -196,3 +198,28 @@ def test_build_pairs_joins_forecast_to_truth(tmp_path):
     assert p.forecast_cm == 3.0
     assert p.truth_cm == 0.0
     assert p.lead_h == 0.0
+
+
+# --- phase hit rate on marginal buckets (S1.1 go/no-go) ---------------------
+
+def test_phase_hit_rate_filters_to_marginal_and_scores_accuracy():
+    items = [
+        PhaseItem(0.5, forecast_snow=True, obs_snow=True),    # marginal, hit
+        PhaseItem(-1.0, forecast_snow=False, obs_snow=True),  # marginal, miss
+        PhaseItem(-2.0, forecast_snow=True, obs_snow=True),   # marginal (|T|=2), hit
+        PhaseItem(5.0, forecast_snow=False, obs_snow=True),   # NOT marginal → ignored
+    ]
+    m = verify.phase_hit_rate(items)
+    assert m["n_events"] == 3
+    assert m["hit_rate"] == pytest.approx(2 / 3)
+
+
+def test_phase_hit_rate_none_when_no_marginal_events():
+    m = verify.phase_hit_rate([PhaseItem(4.0, forecast_snow=True, obs_snow=True)])
+    assert m == {"n_events": 0, "hit_rate": None}
+
+
+def test_phase_hit_rate_custom_marginal_band():
+    items = [PhaseItem(3.0, forecast_snow=True, obs_snow=True)]
+    assert verify.phase_hit_rate(items, marginal_t_c=2.0)["n_events"] == 0
+    assert verify.phase_hit_rate(items, marginal_t_c=4.0)["n_events"] == 1

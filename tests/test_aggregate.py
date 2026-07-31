@@ -2,7 +2,14 @@ from datetime import datetime, timedelta, timezone
 
 import pytest
 
-from minipirineu.aggregate import derive_snowfall, floor_to_bucket, snow_ratio, to_buckets
+from minipirineu.aggregate import (
+    derive_snowfall,
+    derive_snowfall_wetbulb,
+    floor_to_bucket,
+    snow_ratio,
+    to_buckets,
+    wetbulb_snow_ratio,
+)
 
 
 def hourly_times(start: str, n: int) -> list[str]:
@@ -47,6 +54,56 @@ class TestDeriveSnowfall:
 
     def test_missing_inputs_stay_none_not_zero(self):
         assert derive_snowfall([None, 1.0, 1.0], [-2.0, None, -3.0]) == [None, None, 0.45]
+
+
+class TestWetbulbSnowRatio:
+    def test_full_ratio_at_or_below_zero_wet_bulb(self):
+        assert wetbulb_snow_ratio(-5.0) == pytest.approx(0.45)
+        assert wetbulb_snow_ratio(0.0) == pytest.approx(0.45)
+
+    def test_zero_ratio_at_or_above_upper_break(self):
+        assert wetbulb_snow_ratio(1.5) == 0.0
+        assert wetbulb_snow_ratio(3.0) == 0.0
+
+    def test_linear_taper_between_breaks(self):
+        assert wetbulb_snow_ratio(0.75) == pytest.approx(0.225)
+
+    def test_custom_breakpoints_shift_the_taper(self):
+        # the calibration sweep passes explicit breakpoints; a wider transition
+        # lowers the mid-range ratio (0.5 °C between -0.5 and +1.5 → 0.225).
+        assert wetbulb_snow_ratio(0.5, t_full=-0.5, t_zero=1.5) == pytest.approx(
+            0.45 * (1.5 - 0.5) / 2.0)
+        # and the breakpoints still bound it
+        assert wetbulb_snow_ratio(-0.5, t_full=-0.5, t_zero=1.5) == pytest.approx(0.45)
+        assert wetbulb_snow_ratio(1.5, t_full=-0.5, t_zero=1.5) == 0.0
+
+
+class TestDeriveSnowfallWetbulb:
+    def test_cold_saturated_converts_at_full_ratio(self):
+        # Tw well below 0 → full 0.45 ratio, same cm as the dry-bulb path.
+        assert derive_snowfall_wetbulb([1.0], [-3.0], [90.0]) == pytest.approx([0.45])
+
+    def test_warm_humid_yields_rain(self):
+        # Near-saturated and warm → Tw > upper break → no snow.
+        assert derive_snowfall_wetbulb([10.0], [10.0], [99.0]) == [0.0]
+
+    def test_dry_air_makes_snow_where_humid_air_makes_rain(self):
+        # The headline S1.1 behaviour: at the SAME warm dry-bulb T, dry air cools
+        # the wet-bulb below the rain threshold (snow) while humid air does not.
+        dry = derive_snowfall_wetbulb([5.0], [5.0], [50.0])[0]
+        humid = derive_snowfall_wetbulb([5.0], [5.0], [95.0])[0]
+        assert dry > 0.0
+        assert humid == 0.0
+
+    def test_missing_rh_falls_back_to_dry_bulb_ratio(self):
+        # RH gap → dry-bulb snow_ratio(0.0)=0.15, not a nulled hour.
+        assert derive_snowfall_wetbulb([2.0], [0.0], [None]) == pytest.approx([0.3])
+
+    def test_missing_precip_or_temp_stays_none(self):
+        assert derive_snowfall_wetbulb([None, 1.0], [-2.0, None], [90.0, 90.0]) == [
+            None,
+            None,
+        ]
 
 
 class TestToBuckets:

@@ -36,7 +36,8 @@ def test_parse_archive_name_splits_stamp_resort_elevation():
 
 def test_raw_to_rows_rebuckets_local_run_to_utc():
     rows = lf.raw_to_rows(FIXTURE.read_bytes(), "2026-07-20T09:00:40Z", "Z1")
-    assert {r.variable for r in rows} == {"fx.snowfall_cm.arome_hd", "fx.snowfall_cm.arome_25"}
+    assert {r.variable for r in rows} == {
+        "fx.snowfall_cm.arome_hd", "fx.snowfall_cm.arome_25", "fx.snowfall_cm.arome_hd_dry"}
     assert all(r.run_time_utc == "2026-07-20T09:00:40Z" and r.station == "Z1" for r in rows)
     # run is 09:00Z; buckets before it are analysis, not forecasts → dropped, so
     # the earliest scored bucket is the 12:00Z one (00:00Z and 06:00Z are past).
@@ -46,6 +47,12 @@ def test_raw_to_rows_rebuckets_local_run_to_utc():
     assert all(parse_stamp(v) >= parse_stamp("2026-07-20T09:00:40Z") for v in valids)  # forecasts only
     # summer fixture → snowfall is 0 cm, present (never dropped as missing)
     assert all(isinstance(r.value, float) for r in rows)
+    # this trimmed fixture carries no surface RH, so the promoted wet-bulb HD
+    # column degrades per hour to the dry-bulb taper and matches the retained
+    # arome_hd_dry reference here (they diverge only once RH is present).
+    hd = {r.valid_time_utc: r.value for r in rows if r.variable == "fx.snowfall_cm.arome_hd"}
+    dry = {r.valid_time_utc: r.value for r in rows if r.variable == "fx.snowfall_cm.arome_hd_dry"}
+    assert hd and hd == dry
 
 
 def _calm_truth(archive_conn, station, day_utc):

@@ -43,20 +43,34 @@ def test_build_params_requests_previous_day_series_for_both_models():
 
 # --- parsing the real fixture -----------------------------------------------
 
-def test_fixture_yields_both_columns_at_24h_lead():
+def test_fixture_yields_all_scored_columns_at_24h_lead():
     rows = previous_runs.to_forecast_rows(_raw(), "Z1")
     cols = {r.variable for r in rows}
-    assert cols == {"fx.snowfall_cm.arome_25", "fx.snowfall_cm.arome_hd"}
+    # two model columns (HD now wet-bulb) + the retained dry-bulb reference
+    assert cols == {"fx.snowfall_cm.arome_25", "fx.snowfall_cm.arome_hd",
+                    "fx.snowfall_cm.arome_hd_dry"}
     assert all(r.source == "openmeteo" and r.station == "Z1" for r in rows)
     # 48 h of dense day1 → 8 six-hour buckets per column
     per_col = {c: [r for r in rows if r.variable == c] for c in cols}
     assert len(per_col["fx.snowfall_cm.arome_25"]) == 8
     assert len(per_col["fx.snowfall_cm.arome_hd"]) == 8
+    assert len(per_col["fx.snowfall_cm.arome_hd_dry"]) == 8
     # every row is a fixed 24 h lead: run_time = valid_time − 24 h
     for r in rows:
         v = previous_runs.parse_stamp(r.valid_time_utc)
         run = previous_runs.parse_stamp(r.run_time_utc)
         assert (v - run).total_seconds() == 24 * 3600
+
+
+def test_promoted_hd_falls_back_to_dry_reference_without_rh():
+    # this backtest fixture predates the S1.1 RH backfill (B1): with no RH series
+    # the promoted wet-bulb HD column degrades per hour to the dry-bulb taper, so
+    # it equals the retained arome_hd_dry reference bucket-for-bucket. They
+    # diverge only once RH is present.
+    rows = previous_runs.to_forecast_rows(_raw(), "Z1")
+    hd = {r.valid_time_utc: r.value for r in rows if r.variable == "fx.snowfall_cm.arome_hd"}
+    dry = {r.valid_time_utc: r.value for r in rows if r.variable == "fx.snowfall_cm.arome_hd_dry"}
+    assert hd and hd == dry
 
 
 def test_native_25_total_matches_the_recorded_snowfall():
@@ -83,6 +97,27 @@ def test_derived_column_equals_aggregate_derive_snowfall():
     temp = hourly["temperature_2m_previous_day1_meteofrance_arome_france_hd"]
     expected = previous_runs.bucketize(times, aggregate.derive_snowfall(precip, temp))
     assert previous_runs.column_buckets(hourly, times, HD, 1) == expected
+
+
+def test_promoted_hd_diverges_from_dry_reference_when_rh_present():
+    # With RH present (as the S1.1 backfill provides), dry marginal air cools the
+    # wet-bulb below the dry-bulb, so the promoted HD column (wet-bulb) partitions
+    # MORE snow than the retained dry reference — the whole point of S1.1. One
+    # full 6 h HD bucket at a marginal +0.5 °C with dry 40 % RH.
+    hd_id = "meteofrance_arome_france_hd"
+    times = [f"2025-02-01T{h:02d}:00" for h in range(0, 6)]
+    hourly = {
+        "time": times,
+        f"precipitation_previous_day1_{hd_id}": [1.0] * 6,
+        f"temperature_2m_previous_day1_{hd_id}": [0.5] * 6,
+        f"relative_humidity_2m_previous_day1_{hd_id}": [40.0] * 6,
+    }
+    dc = next(d for d in previous_runs.DERIVED_COLUMNS if d.column == "arome_hd_dry")
+    wet = previous_runs.column_buckets(hourly, times, HD, 1)          # promoted: wet-bulb
+    dry = previous_runs.derived_column_buckets(hourly, times, dc, 1)  # reference: dry-bulb
+    assert len(wet) == len(dry) == 1
+    assert wet[0][0] == dry[0][0]            # same bucket
+    assert wet[0][1] > dry[0][1] > 0         # wet-bulb partitions more snow
 
 
 def test_previous_day2_produces_no_rows_for_arome():

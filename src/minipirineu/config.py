@@ -22,14 +22,31 @@ class ModelSpec:
     id: str
     label: str
     # "native": the model serves the snowfall variable directly.
-    # "derived": snowfall estimated from precipitation + band temperature
-    #   (AROME HD serves no snowfall in any form — validated 2026-07,
-    #   see docs/notes/snowfall-semantics.md).
+    # "derived": snowfall estimated from precipitation + band temperature via the
+    #   dry-bulb taper (AROME HD serves no snowfall in any form — validated
+    #   2026-07, see docs/notes/snowfall-semantics.md).
+    # "derived_wetbulb": same, but the rain/snow partition is keyed on Stull
+    #   wet-bulb (T + RH) — the S1.1 promotion (docs/notes/wetbulb-partition.md),
+    #   which beat the dry-bulb baseline on the go/no-go.
     snowfall_source: str
     # Short column id under which this model's snowfall is scored in the
     # verification store (`fx.snowfall_cm.<column>`, T8/T9). Single source of
     # truth so backtest (T9) and live (T11) write the same column names.
     column: str
+
+
+@dataclass(frozen=True)
+class DerivedColumn:
+    """A scored-only snowfall column derived from a fetched model with an
+    alternate partition — NOT a model to fetch (S1.1). Kept out of MODELS so the
+    fetch/render loops are untouched: it is scored side by side in the backtest
+    (T9) and live loop (T11) but never rendered until it beats the frozen
+    baseline (ADR-0003, verification-first gate)."""
+
+    column: str        # scored under `fx.snowfall_cm.<column>` (verify.py)
+    label: str
+    from_model: str    # ModelSpec.id whose precip/temp/RH series feed the derivation
+    partition: str     # "wetbulb" — which aggregate derivation to apply
 
 
 STATIONS: tuple[Station, ...] = (
@@ -60,9 +77,19 @@ STATIONS: tuple[Station, ...] = (
 # requesting these explicitly (never best_match).
 MODELS: tuple[ModelSpec, ...] = (
     ModelSpec("meteofrance_arome_france_hd", "AROME HD 1.3 km",
-              snowfall_source="derived", column="arome_hd"),
+              snowfall_source="derived_wetbulb", column="arome_hd"),
     ModelSpec("meteofrance_arome_france", "AROME 2.5 km",
               snowfall_source="native", column="arome_25"),
+)
+
+# Scored-only reference columns (never rendered). After the S1.1 promotion
+# (2026-07-30) the rendered HD column `arome_hd` IS the wet-bulb derivation;
+# `arome_hd_dry` retains the pre-promotion dry-bulb behaviour so the live loop
+# can keep confirming the improvement against the frozen (dry-bulb) baseline —
+# ROADMAP §1 "priors to confirm live". See docs/notes/wetbulb-partition.md.
+DERIVED_COLUMNS: tuple[DerivedColumn, ...] = (
+    DerivedColumn("arome_hd_dry", "AROME HD (bulbo seco, referencia)",
+                  from_model="meteofrance_arome_france_hd", partition="drybulb"),
 )
 
 # Derived snowfall (models without native snowfall): cm of snow per mm of
@@ -74,6 +101,18 @@ MODELS: tuple[ModelSpec, ...] = (
 DERIVED_SNOW_RATIO_MAX = 0.45  # cm snow per mm water at/below T_FULL
 DERIVED_SNOW_T_FULL_C = -2.0
 DERIVED_SNOW_T_ZERO_C = 1.0
+
+# Wet-bulb partition (S1.1): same 0.45 cold ratio, but the rain/snow taper is
+# keyed on Stull wet-bulb Tw (from T + RH) instead of dry-bulb T — dry air lets
+# snow survive above 0 °C, which the T taper misses. The breakpoints are
+# literature priors (all-snow ≤0 °C Tw, all-rain ≥~1.5 °C Tw; Pyrenees air-T
+# threshold ≈1 °C, ROADMAP S1.1) to be calibrated on the backtest (Slice B).
+WETBULB_T_FULL_C = 0.0   # all-snow at/below this wet-bulb °C
+WETBULB_T_ZERO_C = 1.5   # all-rain at/above this wet-bulb °C
+# Stull (2011) is fitted for RH in [5, 99] %; clamp before evaluating so extreme
+# inputs stay in the empirical range rather than diverging.
+WETBULB_RH_MIN = 5.0
+WETBULB_RH_MAX = 99.0
 
 TIMEZONE = "Europe/Madrid"
 FORECAST_HOURS = 48
@@ -324,6 +363,11 @@ DEAD_BAND_FRAC = 0.20
 # "snow day" is ≥ SNOW_DAY_CM over 24 h (roadmap §1).
 EVENT_BUCKET_CM = 1.0
 SNOW_DAY_CM = 1.0
+
+# S1.1 go/no-go: phase skill is judged on "marginal" buckets only — those whose
+# bucket-mean forecast band temperature is within ±MARGINAL_T_C of 0 °C, where
+# the rain/snow call is genuinely in doubt and the wet-bulb driver can help.
+MARGINAL_T_C = 2.0
 
 
 # --- Previous Runs backtest fetch (S0.6a/T9) --------------------------------

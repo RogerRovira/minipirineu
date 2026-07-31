@@ -10,7 +10,9 @@ key needed (the Previous Runs API is free, non-commercial). Run locally:
 Checks, at Z1 (Bonaigua) coords:
   1. key structure + which `previous_dayN` are served for both AROME models;
   2. archive floor — null before 2024-01-19T12:00Z, populated at/after;
-  3. AROME HD serves no snowfall (previous_day1 all-null → derived column).
+  3. AROME HD serves no snowfall (previous_day1 all-null → derived column);
+  4. surface relative_humidity_2m served (both models) — the S1.1 wet-bulb
+     backfill (BASE_VARS) depends on it.
 
 Exits non-zero if any finding regresses (the API changed under us).
 """
@@ -73,6 +75,14 @@ def probe(session) -> bool:
     print(f"[2] previous_day1 non-null before {floor_day} = {b_nn}  (expect 0)")
     print(f"[2] first non-null at/after {floor_day} = {first}  (expect {floor_day}T12:00)")
     ok &= b_nn == 0 and first == f"{floor_day}T12:00"
+
+    # 4: surface RH served for both models (S1.1 wet-bulb column)
+    rh = _get(session, ["relative_humidity_2m_previous_day1"], "2025-02-01", "2025-02-07")["hourly"]
+    hd_rh = _nonnull(rh[f"relative_humidity_2m_previous_day1_{HD}"])
+    a25_rh = _nonnull(rh[f"relative_humidity_2m_previous_day1_{A25}"])
+    print(f"[4] HD  relative_humidity_2m previous_day1 non-null = {hd_rh}/168  (expect 168)")
+    print(f"[4] 2.5 relative_humidity_2m previous_day1 non-null = {a25_rh}/168  (expect 168)")
+    ok &= hd_rh == 168 and a25_rh == 168
 
     print("PASS — coverage matches docs/notes/previous-runs-coverage.md" if ok
           else "FAIL — a finding regressed; the API changed")

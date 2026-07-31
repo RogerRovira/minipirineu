@@ -58,7 +58,8 @@ def make_session() -> requests.Session:
 
 
 def snowfall_series(spec, series: dict) -> list:
-    """Pick the model's snowfall: native output, or derived from precip + temp.
+    """Pick the model's snowfall: native output, or derived from precip + temp
+    (+ RH for the wet-bulb partition, the S1.1-promoted HD column).
 
     A "native" model whose snowfall comes back all-null means Open-Meteo
     changed what it serves — fail loudly rather than quietly derive.
@@ -67,7 +68,10 @@ def snowfall_series(spec, series: dict) -> list:
         if not any(v is not None for v in series["snowfall_cm"]):
             raise ValueError(f"{spec.id}: native snowfall is all null")
         return series["snowfall_cm"]
-    return aggregate.derive_snowfall(series["precipitation_mm"], series["temperature_c"])
+    return aggregate.derive_column_snowfall(
+        aggregate.DERIVED_PARTITION[spec.snowfall_source],
+        series["precipitation_mm"], series["temperature_c"], series["relative_humidity_pct"],
+    )
 
 
 def _fetch_band(session, station, elevation_m: int, sink: Sink | None) -> dict:

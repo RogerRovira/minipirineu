@@ -88,14 +88,14 @@ def test_run_backfill_upserts_rows_and_is_idempotent(tmp_path):
     ranges = [("2025-02-01", "2025-02-02", "2025-02")]
 
     n = bf.run_backfill(archive, conn, stations, ranges, session=None, now_utc=NOW, fetch=fetch)
-    assert n == 16                       # 8 buckets × 2 columns (arome_25 + arome_hd)
+    assert n == 24              # 8 buckets × 3 columns (arome_25 + arome_hd + arome_hd_wb)
     count = conn.execute("SELECT COUNT(*) FROM verification_values").fetchone()[0]
-    assert count == 16
+    assert count == 24
     # the call went out at Z1's real coords + elevation
     assert fetch.calls[0][:3] == (42.64691, 0.98486, 2262)
     # re-pull the same window → same rows, store count unchanged
     bf.run_backfill(archive, conn, stations, ranges, session=None, now_utc=NOW, fetch=fetch)
-    assert conn.execute("SELECT COUNT(*) FROM verification_values").fetchone()[0] == 16
+    assert conn.execute("SELECT COUNT(*) FROM verification_values").fetchone()[0] == 24
 
 
 def test_run_backfill_writes_forecast_columns_the_verifier_reads(tmp_path):
@@ -106,7 +106,8 @@ def test_run_backfill_writes_forecast_columns_the_verifier_reads(tmp_path):
     bf.run_backfill(archive, conn, stations, [("2025-02-01", "2025-02-02", "2025-02")],
                     session=None, now_utc=NOW, fetch=fetch)
     variables = {v for (v,) in conn.execute("SELECT DISTINCT variable FROM verification_values")}
-    assert variables == {"fx.snowfall_cm.arome_25", "fx.snowfall_cm.arome_hd"}
+    assert variables == {"fx.snowfall_cm.arome_25", "fx.snowfall_cm.arome_hd",
+                         "fx.snowfall_cm.arome_hd_dry"}
 
 
 def _calm_truth_rows(station: str, start: str, end: str) -> list[store.Row]:
@@ -146,10 +147,10 @@ def test_backfilled_rows_are_scored_by_verify_end_to_end(tmp_path):
 
     pairs = verify.build_pairs(conn, ["Z1"], "2025-02-01T00:00:00Z", "2025-02-03T00:00:00Z")
     assert pairs, "verify.build_pairs read zero pairs from the backfilled store"
-    assert {p.column for p in pairs} == {"arome_hd", "arome_25"}
+    assert {p.column for p in pairs} == {"arome_hd", "arome_25", "arome_hd_dry"}
 
     report = verify.verify_report(pairs)
-    for col in ("arome_hd", "arome_25"):
+    for col in ("arome_hd", "arome_25", "arome_hd_dry"):
         m = report["bucket_6h"]["by_column"][col]
         # truth is a flat, calm 0 cm pack; the fixture forecasts real Feb snow, so
         # each column carries non-negative cm bias and its skill still computes.

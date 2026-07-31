@@ -108,7 +108,9 @@ def temp_cells(model: dict, columns: list[tuple[str, str]]) -> str:
 
 
 def model_row_label(model: dict) -> str:
-    note = ' <span class="model-note">*</span>' if model["snowfall_source"] == "derived" else ""
+    # any derived source (dry-bulb "derived" or the S1.1 "derived_wetbulb") gets
+    # the footnote marker — the snow is estimated, not a native model output.
+    note = ' <span class="model-note">*</span>' if model["snowfall_source"].startswith("derived") else ""
     return f'{html.escape(model["label"])}{note}'
 
 

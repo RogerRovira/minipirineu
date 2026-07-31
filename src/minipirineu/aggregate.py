@@ -8,7 +8,10 @@ from minipirineu.config import (
     DERIVED_SNOW_T_FULL_C,
     DERIVED_SNOW_T_ZERO_C,
     FORECAST_HOURS,
+    WETBULB_T_FULL_C,
+    WETBULB_T_ZERO_C,
 )
+from minipirineu.wetbulb import stull_wet_bulb
 
 
 def snow_ratio(temperature_c: float) -> float:
@@ -43,6 +46,87 @@ def derive_snowfall(precipitation_mm: list, temperature_c: list) -> list:
         else:
             derived.append(precip * snow_ratio(temp))
     return derived
+
+
+def wetbulb_snow_ratio(
+    wet_bulb_c: float,
+    *,
+    t_full: float = WETBULB_T_FULL_C,
+    t_zero: float = WETBULB_T_ZERO_C,
+) -> float:
+    """cm of snow per mm of precipitation as a function of wet-bulb temperature.
+
+    Same shape and cold ratio as snow_ratio, but the rain/snow taper is keyed on
+    Stull wet-bulb Tw rather than dry-bulb T (S1.1). The 0.45 cold ratio is a
+    physical water→depth property and does not change with the phase driver; only
+    the transition breakpoints move onto the wet-bulb axis. The breakpoints are
+    kwargs (defaulting to config) so the S1.1 calibration can sweep them without
+    mutating global state — the coefficient-as-kwarg idiom truth_b already uses.
+    """
+    if wet_bulb_c <= t_full:
+        return DERIVED_SNOW_RATIO_MAX
+    if wet_bulb_c >= t_zero:
+        return 0.0
+    return DERIVED_SNOW_RATIO_MAX * (t_zero - wet_bulb_c) / (t_zero - t_full)
+
+
+def derive_snowfall_wetbulb(
+    precipitation_mm: list,
+    temperature_c: list,
+    relative_humidity_pct: list,
+    *,
+    t_full: float = WETBULB_T_FULL_C,
+    t_zero: float = WETBULB_T_ZERO_C,
+) -> list:
+    """Wet-bulb variant of derive_snowfall (S1.1): each hour partitions its own
+    precipitation using the wet-bulb ratio from T and RH.
+
+    Missing precip or temp → None (unknown, not zero), as in derive_snowfall.
+    Missing RH alone is NOT fatal: the hour falls back to the dry-bulb snow_ratio
+    (Tw undefined without humidity), so a humidity gap degrades to the old
+    behaviour rather than nulling an otherwise-known snowfall hour.
+    """
+    derived = []
+    for precip, temp, rh in zip(
+        precipitation_mm, temperature_c, relative_humidity_pct, strict=True
+    ):
+        if precip is None or temp is None:
+            derived.append(None)
+            continue
+        wet_bulb = stull_wet_bulb(temp, rh)
+        ratio = (
+            snow_ratio(temp)
+            if wet_bulb is None
+            else wetbulb_snow_ratio(wet_bulb, t_full=t_full, t_zero=t_zero)
+        )
+        derived.append(precip * ratio)
+    return derived
+
+
+# ModelSpec.snowfall_source → partition name for derive_column_snowfall. The one
+# mapping used by every path (render, live scoring, backtest) so a derived model
+# is partitioned the same everywhere (ADR-0003).
+DERIVED_PARTITION = {"derived": "drybulb", "derived_wetbulb": "wetbulb"}
+
+
+def derive_column_snowfall(
+    partition: str,
+    precipitation_mm: list,
+    temperature_c: list,
+    relative_humidity_pct: list,
+) -> list:
+    """Hourly snowfall (cm) for a derived challenger column (config.DerivedColumn).
+
+    The single place a partition name maps to its derivation, shared by the live
+    scoring path (live_forecast), the render path (ingest_openmeteo) and the
+    backtest (previous_runs) so all write byte-identical cm for the same inputs
+    (ADR-0003 symmetry). "drybulb" ignores RH (the pre-S1.1 taper).
+    """
+    if partition == "wetbulb":
+        return derive_snowfall_wetbulb(precipitation_mm, temperature_c, relative_humidity_pct)
+    if partition == "drybulb":
+        return derive_snowfall(precipitation_mm, temperature_c)
+    raise ValueError(f"unknown derived-column partition: {partition!r}")
 
 
 def floor_to_bucket(dt: datetime) -> datetime:

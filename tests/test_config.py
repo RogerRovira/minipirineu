@@ -41,11 +41,12 @@ def test_models_are_the_two_arome_variants():
 
 
 def test_snowfall_sources_match_validated_api_reality():
-    # AROME HD serves no snowfall variable on Open-Meteo (M1 finding);
-    # AROME 2.5 does. See docs/notes/snowfall-semantics.md.
+    # AROME HD serves no snowfall variable on Open-Meteo (M1 finding), so its
+    # column is derived — since the S1.1 promotion, via the wet-bulb partition
+    # (docs/notes/wetbulb-partition.md). AROME 2.5 serves snowfall natively.
     sources = {spec.id: spec.snowfall_source for spec in MODELS}
     assert sources == {
-        "meteofrance_arome_france_hd": "derived",
+        "meteofrance_arome_france_hd": "derived_wetbulb",
         "meteofrance_arome_france": "native",
     }
 

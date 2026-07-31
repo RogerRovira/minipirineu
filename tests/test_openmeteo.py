@@ -50,6 +50,10 @@ def test_parse_recorded_response():
     for series in parsed["models"].values():
         for key in ("snowfall_cm", "precipitation_mm", "temperature_c"):
             assert len(series[key]) == n
+        # this M1 fixture predates the T4 wide fetch: no RH key. Parsing must be
+        # lenient and surface an all-None RH series, never raise (S1.1).
+        assert len(series["relative_humidity_pct"]) == n
+        assert all(v is None for v in series["relative_humidity_pct"])
         # every model serves precipitation and temperature over its horizon
         real_precip = [v for v in series["precipitation_mm"] if v is not None]
         assert real_precip and all(v >= 0 for v in real_precip)
@@ -73,13 +77,33 @@ def wide_fixture() -> dict:
 
 def test_wide_response_parses_identically_for_rendered_vars():
     # the verification gate: widening the request must not change the page.
-    # Recorded live 2026-07-17 with the full T4 variable set.
+    # Recorded live 2026-07-17 with the full T4 variable set. Surface RH is now
+    # surfaced for the wet-bulb column (S1.1) but is NOT a rendered var, so it
+    # legitimately differs wide vs narrow; the rendered trio must not.
     wide = wide_fixture()
     narrow = {**wide, "hourly": {
         k: v for k, v in wide["hourly"].items()
         if not ("hPa" in k or "wind_" in k or "relative_humidity_2m" in k)
     }}
-    assert openmeteo.parse_response(wide) == openmeteo.parse_response(narrow)
+    pw = openmeteo.parse_response(wide)
+    pn = openmeteo.parse_response(narrow)
+    assert pw["time"] == pn["time"]
+    assert pw["grid_elevation_m"] == pn["grid_elevation_m"]
+    for model_id, series in pw["models"].items():
+        for key in ("snowfall_cm", "precipitation_mm", "temperature_c"):
+            assert series[key] == pn["models"][model_id][key]
+
+
+def test_wide_response_surfaces_surface_rh_both_models():
+    # AROME HD serves surface relative_humidity_2m natively (fixture 2026-07-17),
+    # so the wet-bulb column stays intra-model; the narrow parse has none.
+    wide = wide_fixture()
+    parsed = openmeteo.parse_response(wide)
+    for series in parsed["models"].values():
+        rh = series["relative_humidity_pct"]
+        assert len(rh) == len(parsed["time"])
+        real = [v for v in rh if v is not None]
+        assert real and all(0 <= v <= 100 for v in real)
 
 
 def test_pressure_profiles_serve_arome25_only():

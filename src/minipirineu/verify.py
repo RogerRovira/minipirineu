@@ -32,6 +32,7 @@ from minipirineu.config import (
     DEAD_BAND_ABS_CM,
     DEAD_BAND_FRAC,
     EVENT_BUCKET_CM,
+    MARGINAL_T_C,
     SNOW_DAY_CM,
     XEMA_STATIONS,
 )
@@ -122,6 +123,34 @@ def _skill(h: int, m: int, f: int, c: int) -> dict:
 
 def bucket_metrics(items, event_cm: float = EVENT_BUCKET_CM) -> dict:
     return {**_accumulation(items), **_skill(*_contingency(items, event_cm))}
+
+
+# --- phase skill on marginal buckets (S1.1 go/no-go) ------------------------
+
+@dataclass(frozen=True)
+class PhaseItem:
+    """One bucket where a rain/snow call was warranted (precipitation fell).
+    band_t_c is the bucket-mean forecast band temperature (the marginal filter);
+    the two booleans are the forecast's and the observation's snow/rain call.
+    Built by the S1.1 backtest evaluator, which owns the domain definitions."""
+
+    band_t_c: float
+    forecast_snow: bool
+    obs_snow: bool
+
+
+def phase_hit_rate(items, *, marginal_t_c: float = MARGINAL_T_C) -> dict:
+    """Fraction of MARGINAL buckets whose forecast phase matches the observed
+    phase (S1.1 go/no-go). Marginal = |bucket-mean band T| ≤ marginal_t_c, the
+    band near 0 °C where the rain/snow call is genuinely in doubt and the
+    wet-bulb driver can help; away from freezing every method agrees, so scoring
+    there would only dilute the signal. Returns the marginal event count (the
+    ≥30 sample-size gate) and the hit rate (None if no marginal events)."""
+    marginal = [it for it in items if abs(it.band_t_c) <= marginal_t_c]
+    if not marginal:
+        return {"n_events": 0, "hit_rate": None}
+    hits = sum(it.forecast_snow == it.obs_snow for it in marginal)
+    return {"n_events": len(marginal), "hit_rate": hits / len(marginal)}
 
 
 def _group(items, dims: tuple[str, ...]) -> dict:

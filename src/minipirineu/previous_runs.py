@@ -28,6 +28,7 @@ from minipirineu.config import (
     BACKTEST_LEAD_DAYS,
     BUCKET_HOURS,
     CALL_UNIT_DAYS,
+    DERIVED_COLUMNS,
     MODELS,
     PREV_LEAD_H,
 )
@@ -37,9 +38,12 @@ from minipirineu.verify import forecast_variable
 
 API_URL = "https://previous-runs-api.open-meteo.com/v1/forecast"
 SOURCE = "openmeteo"  # store row source (build_pairs is source-agnostic, T8)
-# The three series requested per lead day. HD returns snowfall all-null (M1); we
-# ignore it and derive HD's column from precipitation + temperature instead.
-BASE_VARS = ("temperature_2m", "precipitation", "snowfall")
+# The series requested per lead day. HD returns snowfall all-null (M1); we ignore
+# it and derive HD's column from precipitation + temperature. relative_humidity_2m
+# (served non-null for both AROME models on the Previous Runs API, probed
+# 2026-07-30) feeds the wet-bulb challenger column (S1.1) — the reason the
+# backtest is re-fetched; it is a no-op for the two model columns.
+BASE_VARS = ("temperature_2m", "precipitation", "snowfall", "relative_humidity_2m")
 MODEL_IDS = tuple(spec.id for spec in MODELS)
 
 
@@ -136,8 +140,9 @@ def bucketize(times: list[str], values: list, hours: int = BUCKET_HOURS) -> list
 def column_buckets(hourly: dict, times: list[str], spec, day: int) -> list[tuple[str, float]]:
     """One model's snowfall column, as 6 h bucket cm. Native models bucket their
     own snowfall; derived models (AROME HD) recompute per-hour snowfall from
-    precipitation + temperature via aggregate.derive_snowfall — the same rule the
-    live column uses (import, don't duplicate)."""
+    precipitation + temperature (+ RH for the wet-bulb partition) via
+    aggregate.derive_column_snowfall — the same rule the live column uses (import,
+    don't duplicate), so backtest and live are byte-identical (ADR-0003)."""
     if spec.snowfall_source == "native":
         series = _hourly_series(hourly, "snowfall", day, spec.id)
         return bucketize(times, series) if series is not None else []
@@ -145,7 +150,27 @@ def column_buckets(hourly: dict, times: list[str], spec, day: int) -> list[tuple
     temp = _hourly_series(hourly, "temperature_2m", day, spec.id)
     if precip is None or temp is None:
         return []
-    return bucketize(times, aggregate.derive_snowfall(precip, temp))
+    partition = aggregate.DERIVED_PARTITION[spec.snowfall_source]
+    rh = _hourly_series(hourly, "relative_humidity_2m", day, spec.id) or [None] * len(times)
+    return bucketize(times, aggregate.derive_column_snowfall(partition, precip, temp, rh))
+
+
+def derived_column_buckets(hourly: dict, times: list[str], dc, day: int) -> list[tuple[str, float]]:
+    """A derived challenger column's snowfall as 6 h bucket cm (S1.1). Reads the
+    source model's precip/temp/RH previous-day series and applies the alternate
+    partition (aggregate.derive_column_snowfall). RH may be absent from a
+    pre-S1.1 backfill: a missing RH series degrades per hour to the dry-bulb
+    taper inside the derivation (so the column still populates), while missing
+    precip/temp yields no rows — missing stays missing."""
+    precip = _hourly_series(hourly, "precipitation", day, dc.from_model)
+    temp = _hourly_series(hourly, "temperature_2m", day, dc.from_model)
+    if precip is None or temp is None:
+        return []
+    rh = _hourly_series(hourly, "relative_humidity_2m", day, dc.from_model)
+    if rh is None:
+        rh = [None] * len(times)
+    snow = aggregate.derive_column_snowfall(dc.partition, precip, temp, rh)
+    return bucketize(times, snow)
 
 
 def to_forecast_rows(raw: dict, station_code: str, lead_days=BACKTEST_LEAD_DAYS) -> list[Row]:
@@ -161,6 +186,16 @@ def to_forecast_rows(raw: dict, station_code: str, lead_days=BACKTEST_LEAD_DAYS)
         for day in lead_days:
             lead_h = PREV_LEAD_H[day]
             for b_start, cm in column_buckets(hourly, times, spec, day):
+                run = _fmt_z(parse_stamp(b_start) - timedelta(hours=lead_h))
+                rows.append(Row(SOURCE, station_code, run, b_start, variable, cm))
+    # Scored-only challenger columns (S1.1) alongside the model columns: same
+    # buckets/lead convention, different partition. Never rendered — verify.py
+    # scores them side by side with the frozen baseline.
+    for dc in DERIVED_COLUMNS:
+        variable = forecast_variable(dc.column)
+        for day in lead_days:
+            lead_h = PREV_LEAD_H[day]
+            for b_start, cm in derived_column_buckets(hourly, times, dc, day):
                 run = _fmt_z(parse_stamp(b_start) - timedelta(hours=lead_h))
                 rows.append(Row(SOURCE, station_code, run, b_start, variable, cm))
     return rows

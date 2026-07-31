@@ -76,10 +76,19 @@ def parse_response(raw: dict) -> dict:
             if len(values) != len(times):
                 raise ValueError(f"hourly series length mismatch for {var}_{model_id}")
             series[var] = values
+        # Surface RH feeds the wet-bulb partition (S1.1) but is not part of the
+        # rendered trio: it is archived wide (T4) and may be absent from older
+        # narrow fixtures, or all-null for a model that does not serve it. Keep
+        # it lenient — missing key → all-None series — so parsing never breaks on
+        # a payload without RH; a present-but-mismatched series is still a bug.
+        rh = hourly.get(f"relative_humidity_2m_{model_id}")
+        if rh is not None and len(rh) != len(times):
+            raise ValueError(f"hourly series length mismatch for relative_humidity_2m_{model_id}")
         models[model_id] = {
             "snowfall_cm": series["snowfall"],
             "precipitation_mm": series["precipitation"],
             "temperature_c": series["temperature_2m"],
+            "relative_humidity_pct": rh if rh is not None else [None] * len(times),
         }
     return {
         "time": times,
