@@ -22,7 +22,7 @@ import sys
 from datetime import datetime, timedelta
 from pathlib import Path
 
-from minipirineu import ingest_openmeteo, openmeteo, previous_runs, store, verify
+from minipirineu import ingest_openmeteo, openmeteo, opg, previous_runs, store, verify
 from minipirineu.archive import Archive, run_time_from_path
 from minipirineu.config import MODELS, STATIONS, XEMA_STATIONS
 from minipirineu.store import Row
@@ -64,10 +64,17 @@ def _utc_times(local_times: list[str], offset_s: int) -> list[str]:
             for t in local_times]
 
 
-def raw_to_rows(raw_bytes: bytes, run_time_utc: str, station_code: str) -> list[Row]:
+def raw_to_rows(raw_bytes: bytes, run_time_utc: str, station_code: str,
+                *, point_id: str | None = None, elevation_m: float | None = None) -> list[Row]:
     """One archived run at one band → forecast rows (fx.snowfall_cm.<col>) on the
     6 h UTC grid. Same snowfall rule as the site and same bucketizer as the
-    backtest (ADR-0003), so the numbers are directly comparable."""
+    backtest (ADR-0003), so the numbers are directly comparable.
+
+    With `point_id`/`elevation_m` (the resort and band the run was fetched at),
+    an OPG-corrected column `<column>_opg` is written alongside the plain one
+    for the bands whose precipitation saturates (S1.3) — the live half of the
+    same A/B the backtest gate scores. Factor 1.0 writes nothing extra.
+    """
     raw = json.loads(raw_bytes)
     parsed = openmeteo.parse_response(raw)
     utc_times = _utc_times(parsed["time"], raw.get("utc_offset_seconds", 0))
@@ -80,12 +87,18 @@ def raw_to_rows(raw_bytes: bytes, run_time_utc: str, station_code: str) -> list[
         except ValueError:
             continue  # a native model gone all-null → API changed; skip, never 0
         variable = verify.forecast_variable(spec.column)
+        f = (opg.point_factor(point_id, spec.id, elevation_m)
+             if point_id is not None and elevation_m is not None else 1.0)
+        opg_variable = verify.forecast_variable(opg.opg_column(spec.column))
         for bucket_start, cm in previous_runs.bucketize(utc_times, snow):
             # a bucket starting before the run is analysis/nowcast, not a
             # forecast — scoring it would flatter forecast skill; drop it.
             if parse_stamp(bucket_start) < run_dt:
                 continue
             rows.append(Row(SOURCE, station_code, run_time_utc, bucket_start, variable, cm))
+            if f != 1.0:
+                rows.append(Row(SOURCE, station_code, run_time_utc, bucket_start,
+                                opg_variable, round(cm * f, 1)))
     return rows
 
 
@@ -100,7 +113,8 @@ def ingest_live_forecasts(archive: Archive, conn, *, targets=None) -> int:
         station = targets.get((resort, elev))
         if station is None:
             continue  # not a scored high band (low/mid band, or a non-truth resort)
-        total += store.upsert_rows(conn, raw_to_rows(raw_bytes, run_time, station))
+        total += store.upsert_rows(conn, raw_to_rows(raw_bytes, run_time, station,
+                                                     point_id=resort, elevation_m=elev))
     return total
 
 

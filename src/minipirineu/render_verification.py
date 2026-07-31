@@ -20,6 +20,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from string import Template
 
+from minipirineu import opg
 from minipirineu.config import MODELS
 
 TEMPLATE_PATH = Path("templates/verificacion.html.tmpl")
@@ -57,9 +58,22 @@ def _metric_cells(metrics: dict | None, live: dict | None, key: str) -> str:
     return f'<td>{_fmt(base_v)}</td><td class="live">{_fmt(live_v)}</td>'
 
 
+def is_candidate(column: str) -> bool:
+    """True for columns that exist only to be gated, not to be read by a skier.
+
+    S1.3 writes an OPG-corrected variant beside every affected column so the
+    go/no-go can score them side by side (`python -m minipirineu.opg gate`).
+    Those rows stay out of the public page: they have no frozen-baseline
+    counterpart, so every "base" cell would be an em dash, and publishing an
+    ungated candidate is what ADR-0003 exists to prevent. They remain in the
+    machine report and in the store.
+    """
+    return opg.base_column(column) is not None
+
+
 def metric_table(title: str, metrics, base_by_col: dict, live_by_col: dict) -> str:
     """One table: a row per column, each metric as a (baseline, live) pair."""
-    columns = sorted(set(base_by_col) | set(live_by_col))
+    columns = sorted(c for c in set(base_by_col) | set(live_by_col) if not is_candidate(c))
     if not columns:
         return (f'<section><h2>{html.escape(title)}</h2>'
                 '<p class="placeholder">Sin columnas todavía.</p></section>')
