@@ -1,6 +1,6 @@
 {
  "schema": "minipirineu/meteocat/v1",
- "fetched_at": "2026-08-07T00:48:58+00:00",
+ "fetched_at": "2026-08-07T14:36:00+00:00",
  "zones": [
   {
    "zone_id": 1,
@@ -27,7 +27,7 @@
       {
        "start": 12,
        "cel": 20,
-       "probabilitat": 2,
+       "probabilitat": 3,
        "cota_m": null
       },
       {
@@ -57,7 +57,7 @@
       },
       {
        "start": 12,
-       "cel": 7,
+       "cel": 24,
        "probabilitat": 4,
        "cota_m": null
       },
@@ -98,7 +98,7 @@
       {
        "start": 12,
        "cel": 20,
-       "probabilitat": 2,
+       "probabilitat": 3,
        "cota_m": null
       },
       {
@@ -128,7 +128,7 @@
       },
       {
        "start": 12,
-       "cel": 7,
+       "cel": 24,
        "probabilitat": 4,
        "cota_m": null
       },
@@ -174,12 +174,12 @@
       },
       {
        "start": 18,
-       "cel": 31,
+       "cel": 24,
        "probabilitat": 4,
        "cota_m": null
       }
      ],
-     "acumulacio": 3,
+     "acumulacio": 4,
      "acumulacio_neu": null
     },
     {
@@ -199,13 +199,13 @@
       },
       {
        "start": 12,
-       "cel": 20,
-       "probabilitat": 3,
+       "cel": 31,
+       "probabilitat": 4,
        "cota_m": null
       },
       {
        "start": 18,
-       "cel": 31,
+       "cel": 7,
        "probabilitat": 4,
        "cota_m": null
       }
