@@ -25,7 +25,7 @@ import requests
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 
-from minipirineu import aggregate, openmeteo, store
+from minipirineu import aggregate, config, openmeteo, opg, store
 from minipirineu.archive import Archive
 from minipirineu.config import MODELS, STATIONS, TIMEZONE
 from minipirineu.freezing_level import freezing_rows
@@ -79,11 +79,36 @@ def _fetch_band(session, station, elevation_m: int, sink: Sink | None) -> dict:
     return json.loads(raw_bytes)
 
 
+def band_snowfall(spec, series: dict, elevation_m: int, station_id: str) -> tuple[list, list, float]:
+    """The band's (snowfall, precipitation, opg factor) as published.
+
+    S1.3: above the elevation where Open-Meteo's precipitation stops responding
+    to `elevation` (opg.py), the series are scaled by the orographic factor —
+    but only once `config.OPG_ENABLED` is flipped, which ADR-0003 allows solely
+    after the measured gate passes. Disabled, this returns the model's own
+    numbers untouched and the published JSON is byte-identical.
+    """
+    snow = snowfall_series(spec, series)
+    precip = series["precipitation_mm"]
+    factor = (opg.point_factor(station_id, spec.id, elevation_m)
+              if config.OPG_ENABLED else 1.0)
+    if factor == 1.0:
+        return snow, precip, 1.0
+    return opg.scale_series(snow, factor), opg.scale_series(precip, factor), factor
+
+
+def _opg_detections(precip_by_model: dict[str, dict[int, list]]) -> dict:
+    """Per-model saturation detection for one station's run (all bands seen)."""
+    return {model_id: opg.detect_reference(by_elevation)
+            for model_id, by_elevation in precip_by_model.items()}
+
+
 def build_snapshot(session: requests.Session, now_local: datetime,
                    sink: Sink | None = None) -> dict:
     stations_out = []
     for station in STATIONS:
         bands_out = []
+        precip_by_model: dict[str, dict[int, list]] = {}
         for band, elevation_m in station.bands:
             raw = _fetch_band(session, station, elevation_m, sink)
             if sink is not None and elevation_m == station.bands[0][1]:
@@ -95,10 +120,12 @@ def build_snapshot(session: requests.Session, now_local: datetime,
             models_out = []
             for spec in MODELS:
                 series = parsed["models"][spec.id]
+                precip_by_model.setdefault(spec.id, {})[elevation_m] = series["precipitation_mm"]
+                snow, precip, factor = band_snowfall(spec, series, elevation_m, station.id)
                 agg = aggregate.to_buckets(
                     parsed["time"],
-                    snowfall_series(spec, series),
-                    series["precipitation_mm"],
+                    snow,
+                    precip,
                     series["temperature_c"],
                     now_local,
                 )
@@ -107,6 +134,9 @@ def build_snapshot(session: requests.Session, now_local: datetime,
                         "model": spec.id,
                         "label": spec.label,
                         "snowfall_source": spec.snowfall_source,
+                        # present only when the correction actually moved this
+                        # band, so a disabled OPG leaves the JSON unchanged
+                        **({"opg_factor": round(factor, 3)} if factor != 1.0 else {}),
                         **agg,
                     }
                 )
@@ -118,6 +148,15 @@ def build_snapshot(session: requests.Session, now_local: datetime,
                     "models": models_out,
                 }
             )
+        detections = _opg_detections(precip_by_model)
+        for model_id, detection in detections.items():
+            drift = opg.reference_drift(station.id, model_id, detection)
+            if drift:
+                # the correction is only valid while the grid behaves as measured
+                print(drift, file=sys.stderr)
+        if sink is not None:
+            store.upsert_rows(sink.conn,
+                              opg.reference_rows(station.id, sink.run_time_utc, detections))
         stations_out.append(
             {
                 "id": station.id,
