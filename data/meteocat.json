@@ -1,6 +1,6 @@
 {
  "schema": "minipirineu/meteocat/v1",
- "fetched_at": "2026-08-10T14:40:34+00:00",
+ "fetched_at": "2026-08-11T15:42:02+00:00",
  "zones": [
   {
    "zone_id": 1,
@@ -9,37 +9,6 @@
     "Baqueira"
    ],
    "days": [
-    {
-     "date": "2026-08-10",
-     "blocks": [
-      {
-       "start": 0,
-       "cel": 3,
-       "probabilitat": 2,
-       "cota_m": null
-      },
-      {
-       "start": 6,
-       "cel": 3,
-       "probabilitat": 1,
-       "cota_m": null
-      },
-      {
-       "start": 12,
-       "cel": 24,
-       "probabilitat": 5,
-       "cota_m": null
-      },
-      {
-       "start": 18,
-       "cel": 20,
-       "probabilitat": 2,
-       "cota_m": null
-      }
-     ],
-     "acumulacio": 3,
-     "acumulacio_neu": null
-    },
     {
      "date": "2026-08-11",
      "blocks": [
@@ -58,17 +27,48 @@
       {
        "start": 12,
        "cel": 7,
+       "probabilitat": 4,
+       "cota_m": null
+      },
+      {
+       "start": 18,
+       "cel": 24,
        "probabilitat": 5,
+       "cota_m": null
+      }
+     ],
+     "acumulacio": 3,
+     "acumulacio_neu": null
+    },
+    {
+     "date": "2026-08-12",
+     "blocks": [
+      {
+       "start": 0,
+       "cel": 1,
+       "probabilitat": 1,
+       "cota_m": null
+      },
+      {
+       "start": 6,
+       "cel": 1,
+       "probabilitat": 1,
+       "cota_m": null
+      },
+      {
+       "start": 12,
+       "cel": 20,
+       "probabilitat": 2,
        "cota_m": null
       },
       {
        "start": 18,
        "cel": 3,
-       "probabilitat": 2,
+       "probabilitat": 1,
        "cota_m": null
       }
      ],
-     "acumulacio": 3,
+     "acumulacio": 2,
      "acumulacio_neu": null
     }
    ]
@@ -81,37 +81,6 @@
    ],
    "days": [
     {
-     "date": "2026-08-10",
-     "blocks": [
-      {
-       "start": 0,
-       "cel": 20,
-       "probabilitat": 2,
-       "cota_m": null
-      },
-      {
-       "start": 6,
-       "cel": 20,
-       "probabilitat": 1,
-       "cota_m": null
-      },
-      {
-       "start": 12,
-       "cel": 24,
-       "probabilitat": 5,
-       "cota_m": null
-      },
-      {
-       "start": 18,
-       "cel": 3,
-       "probabilitat": 1,
-       "cota_m": null
-      }
-     ],
-     "acumulacio": 4,
-     "acumulacio_neu": null
-    },
-    {
      "date": "2026-08-11",
      "blocks": [
       {
@@ -129,17 +98,48 @@
       {
        "start": 12,
        "cel": 24,
-       "probabilitat": 5,
+       "probabilitat": 4,
        "cota_m": null
       },
       {
        "start": 18,
-       "cel": 20,
-       "probabilitat": 3,
+       "cel": 24,
+       "probabilitat": 5,
        "cota_m": null
       }
      ],
      "acumulacio": 3,
+     "acumulacio_neu": null
+    },
+    {
+     "date": "2026-08-12",
+     "blocks": [
+      {
+       "start": 0,
+       "cel": 1,
+       "probabilitat": 1,
+       "cota_m": null
+      },
+      {
+       "start": 6,
+       "cel": 1,
+       "probabilitat": 1,
+       "cota_m": null
+      },
+      {
+       "start": 12,
+       "cel": 7,
+       "probabilitat": 3,
+       "cota_m": null
+      },
+      {
+       "start": 18,
+       "cel": 3,
+       "probabilitat": 1,
+       "cota_m": null
+      }
+     ],
+     "acumulacio": 2,
      "acumulacio_neu": null
     }
    ]
@@ -152,37 +152,6 @@
    ],
    "days": [
     {
-     "date": "2026-08-10",
-     "blocks": [
-      {
-       "start": 0,
-       "cel": 23,
-       "probabilitat": 2,
-       "cota_m": null
-      },
-      {
-       "start": 6,
-       "cel": 3,
-       "probabilitat": 1,
-       "cota_m": null
-      },
-      {
-       "start": 12,
-       "cel": 20,
-       "probabilitat": 4,
-       "cota_m": null
-      },
-      {
-       "start": 18,
-       "cel": 1,
-       "probabilitat": 1,
-       "cota_m": null
-      }
-     ],
-     "acumulacio": 3,
-     "acumulacio_neu": null
-    },
-    {
      "date": "2026-08-11",
      "blocks": [
       {
@@ -199,8 +168,8 @@
       },
       {
        "start": 12,
-       "cel": 3,
-       "probabilitat": 3,
+       "cel": 24,
+       "probabilitat": 5,
        "cota_m": null
       },
       {
@@ -210,7 +179,38 @@
        "cota_m": null
       }
      ],
-     "acumulacio": 3,
+     "acumulacio": 4,
+     "acumulacio_neu": null
+    },
+    {
+     "date": "2026-08-12",
+     "blocks": [
+      {
+       "start": 0,
+       "cel": 1,
+       "probabilitat": 1,
+       "cota_m": null
+      },
+      {
+       "start": 6,
+       "cel": 1,
+       "probabilitat": 1,
+       "cota_m": null
+      },
+      {
+       "start": 12,
+       "cel": 3,
+       "probabilitat": 2,
+       "cota_m": null
+      },
+      {
+       "start": 18,
+       "cel": 2,
+       "probabilitat": 1,
+       "cota_m": null
+      }
+     ],
+     "acumulacio": 2,
      "acumulacio_neu": null
     }
    ]
