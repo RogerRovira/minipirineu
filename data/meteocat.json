@@ -1,6 +1,6 @@
 {
  "schema": "minipirineu/meteocat/v1",
- "fetched_at": "2026-08-19T14:16:01+00:00",
+ "fetched_at": "2026-08-20T14:18:20+00:00",
  "zones": [
   {
    "zone_id": 1,
@@ -9,37 +9,6 @@
     "Baqueira"
    ],
    "days": [
-    {
-     "date": "2026-08-19",
-     "blocks": [
-      {
-       "start": 0,
-       "cel": 1,
-       "probabilitat": 1,
-       "cota_m": null
-      },
-      {
-       "start": 6,
-       "cel": 3,
-       "probabilitat": 1,
-       "cota_m": null
-      },
-      {
-       "start": 12,
-       "cel": 20,
-       "probabilitat": 3,
-       "cota_m": null
-      },
-      {
-       "start": 18,
-       "cel": 31,
-       "probabilitat": 4,
-       "cota_m": null
-      }
-     ],
-     "acumulacio": 3,
-     "acumulacio_neu": null
-    },
     {
      "date": "2026-08-20",
      "blocks": [
@@ -57,14 +26,45 @@
       },
       {
        "start": 12,
-       "cel": 20,
-       "probabilitat": 2,
+       "cel": 7,
+       "probabilitat": 4,
        "cota_m": null
       },
       {
        "start": 18,
        "cel": 24,
        "probabilitat": 5,
+       "cota_m": null
+      }
+     ],
+     "acumulacio": 3,
+     "acumulacio_neu": null
+    },
+    {
+     "date": "2026-08-21",
+     "blocks": [
+      {
+       "start": 0,
+       "cel": 6,
+       "probabilitat": 5,
+       "cota_m": null
+      },
+      {
+       "start": 6,
+       "cel": 31,
+       "probabilitat": 3,
+       "cota_m": null
+      },
+      {
+       "start": 12,
+       "cel": 6,
+       "probabilitat": 4,
+       "cota_m": null
+      },
+      {
+       "start": 18,
+       "cel": 20,
+       "probabilitat": 3,
        "cota_m": null
       }
      ],
@@ -80,37 +80,6 @@
     "Boí Taüll"
    ],
    "days": [
-    {
-     "date": "2026-08-19",
-     "blocks": [
-      {
-       "start": 0,
-       "cel": 1,
-       "probabilitat": 1,
-       "cota_m": null
-      },
-      {
-       "start": 6,
-       "cel": 3,
-       "probabilitat": 1,
-       "cota_m": null
-      },
-      {
-       "start": 12,
-       "cel": 20,
-       "probabilitat": 3,
-       "cota_m": null
-      },
-      {
-       "start": 18,
-       "cel": 31,
-       "probabilitat": 3,
-       "cota_m": null
-      }
-     ],
-     "acumulacio": 2,
-     "acumulacio_neu": null
-    },
     {
      "date": "2026-08-20",
      "blocks": [
@@ -128,8 +97,8 @@
       },
       {
        "start": 12,
-       "cel": 20,
-       "probabilitat": 2,
+       "cel": 31,
+       "probabilitat": 3,
        "cota_m": null
       },
       {
@@ -139,7 +108,38 @@
        "cota_m": null
       }
      ],
-     "acumulacio": 2,
+     "acumulacio": 3,
+     "acumulacio_neu": null
+    },
+    {
+     "date": "2026-08-21",
+     "blocks": [
+      {
+       "start": 0,
+       "cel": 32,
+       "probabilitat": 4,
+       "cota_m": null
+      },
+      {
+       "start": 6,
+       "cel": 4,
+       "probabilitat": 3,
+       "cota_m": null
+      },
+      {
+       "start": 12,
+       "cel": 31,
+       "probabilitat": 4,
+       "cota_m": null
+      },
+      {
+       "start": 18,
+       "cel": 20,
+       "probabilitat": 3,
+       "cota_m": null
+      }
+     ],
+     "acumulacio": 3,
      "acumulacio_neu": null
     }
    ]
@@ -151,37 +151,6 @@
     "La Molina"
    ],
    "days": [
-    {
-     "date": "2026-08-19",
-     "blocks": [
-      {
-       "start": 0,
-       "cel": 1,
-       "probabilitat": 1,
-       "cota_m": null
-      },
-      {
-       "start": 6,
-       "cel": 1,
-       "probabilitat": 1,
-       "cota_m": null
-      },
-      {
-       "start": 12,
-       "cel": 3,
-       "probabilitat": 1,
-       "cota_m": null
-      },
-      {
-       "start": 18,
-       "cel": 3,
-       "probabilitat": 2,
-       "cota_m": null
-      }
-     ],
-     "acumulacio": 2,
-     "acumulacio_neu": null
-    },
     {
      "date": "2026-08-20",
      "blocks": [
@@ -199,18 +168,49 @@
       },
       {
        "start": 12,
-       "cel": 20,
-       "probabilitat": 2,
+       "cel": 31,
+       "probabilitat": 3,
        "cota_m": null
       },
       {
        "start": 18,
-       "cel": 20,
+       "cel": 31,
        "probabilitat": 3,
        "cota_m": null
       }
      ],
-     "acumulacio": 2,
+     "acumulacio": 3,
+     "acumulacio_neu": null
+    },
+    {
+     "date": "2026-08-21",
+     "blocks": [
+      {
+       "start": 0,
+       "cel": 32,
+       "probabilitat": 4,
+       "cota_m": null
+      },
+      {
+       "start": 6,
+       "cel": 32,
+       "probabilitat": 4,
+       "cota_m": null
+      },
+      {
+       "start": 12,
+       "cel": 7,
+       "probabilitat": 4,
+       "cota_m": null
+      },
+      {
+       "start": 18,
+       "cel": 6,
+       "probabilitat": 5,
+       "cota_m": null
+      }
+     ],
+     "acumulacio": 3,
      "acumulacio_neu": null
     }
    ]
