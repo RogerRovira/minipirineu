@@ -78,6 +78,10 @@ Comprobado en Baqueira (ene–feb 2026, AROME 2.5):
   re-particiona lluvia/nieve a la cota. En cota alta la nieve nativa puede
   infraestimar (y en cota baja sobreestimar) cuando la cota de nieve cae a media
   montaña.
+- **Seguimiento (S1.3, 2026-07-31)**: esta saturación se midió después en los 3
+  resorts y los 2 modelos sobre el historial de runs commiteados, y resultó **no
+  ser universal** (Boí Taüll no satura; La Molina solo en HD). Es la base de la
+  corrección orográfica: [`docs/notes/opg.md`](opg.md).
 - Consecuencia de producto: la diferenciación fina por cota la dan la temperatura
   por cota y la columna derivada; la columna nativa de AROME 2.5 puede repetir el
   mismo valor en cotas contiguas. La web debe mostrarse con la temperatura por cota

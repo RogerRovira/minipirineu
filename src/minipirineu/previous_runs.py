@@ -23,7 +23,7 @@ from datetime import datetime, timedelta
 
 import requests
 
-from minipirineu import aggregate
+from minipirineu import aggregate, opg
 from minipirineu.config import (
     BACKTEST_LEAD_DAYS,
     BUCKET_HOURS,
@@ -152,17 +152,32 @@ def to_forecast_rows(raw: dict, station_code: str, lead_days=BACKTEST_LEAD_DAYS)
     """Decoded response → forecast store rows, one per (model column, lead, 6 h
     bucket). valid_time = bucket start; run_time = valid_time − lead (24 h for
     day1); variable = `fx.snowfall_cm.<column>` (T8 convention). Empty series
-    (AROME day2, HD snowfall) simply contribute no rows."""
+    (AROME day2, HD snowfall) simply contribute no rows.
+
+    Where the point's precipitation saturates with elevation (S1.3), a second,
+    OPG-corrected column `<column>_opg` is written alongside — never instead:
+    the gate compares them (ADR-0003). A point with factor 1.0 would produce an
+    identical column, so no variant rows are written for it.
+    """
     hourly = raw["hourly"]
     times = hourly["time"]
+    elevation_m = raw.get("elevation")
     rows: list[Row] = []
     for spec in MODELS:
         variable = forecast_variable(spec.column)
+        f = (opg.point_factor(station_code, spec.id, elevation_m)
+             if elevation_m is not None else 1.0)
+        opg_variable = forecast_variable(opg.opg_column(spec.column))
         for day in lead_days:
             lead_h = PREV_LEAD_H[day]
-            for b_start, cm in column_buckets(hourly, times, spec, day):
+            buckets = column_buckets(hourly, times, spec, day)
+            for b_start, cm in buckets:
                 run = _fmt_z(parse_stamp(b_start) - timedelta(hours=lead_h))
                 rows.append(Row(SOURCE, station_code, run, b_start, variable, cm))
+            if f != 1.0:
+                for b_start, cm in opg.scale_buckets(buckets, f):
+                    run = _fmt_z(parse_stamp(b_start) - timedelta(hours=lead_h))
+                    rows.append(Row(SOURCE, station_code, run, b_start, opg_variable, cm))
     return rows
 
 
