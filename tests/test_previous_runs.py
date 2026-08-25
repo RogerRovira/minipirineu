@@ -46,7 +46,9 @@ def test_build_params_requests_previous_day_series_for_both_models():
 def test_fixture_yields_both_columns_at_24h_lead():
     rows = previous_runs.to_forecast_rows(_raw(), "Z1")
     cols = {r.variable for r in rows}
-    assert cols == {"fx.snowfall_cm.arome_25", "fx.snowfall_cm.arome_hd"}
+    # Z1 (2262 m) sits above Baqueira's measured saturation elevation, so each
+    # base column also gets its OPG variant (S1.3) — alongside, never instead.
+    assert {"fx.snowfall_cm.arome_25", "fx.snowfall_cm.arome_hd"} <= cols
     assert all(r.source == "openmeteo" and r.station == "Z1" for r in rows)
     # 48 h of dense day1 → 8 six-hour buckets per column
     per_col = {c: [r for r in rows if r.variable == c] for c in cols}

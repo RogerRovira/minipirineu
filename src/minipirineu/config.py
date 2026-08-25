@@ -326,6 +326,74 @@ EVENT_BUCKET_CM = 1.0
 SNOW_DAY_CM = 1.0
 
 
+# --- S1.3 Orographic precipitation gradient (OPG) ---------------------------
+#
+# Open-Meteo downscales temperature to the requested `elevation`, but NOT
+# precipitation: `elevation` only steers grid-cell selection, so above the
+# highest neighbouring cell the same cell answers every higher band and precip
+# stops responding to elevation (measured, see docs/notes/opg.md). The
+# correction re-imposes an elevation gradient above that saturation height.
+#
+# Ships DISABLED (ADR-0003): the variant column is scored beside the baseline
+# one, and only a measured win flips the flag below.
+
+# Publish gate. False = the rendered page/JSON is byte-identical to today's;
+# the OPG column is still computed and scored in the verification store.
+OPG_ENABLED = False
+
+# Fractional precipitation enhancement per 100 m above the saturation
+# elevation. Prior, not a fitted constant (ADR-0003 pt 4): it sits between the
+# median gradient AROME itself resolves between its own cells at these resorts
+# (+2.6 %/100 m over 39 committed runs, docs/notes/opg.md) and the literature
+# range for winter mountain OPG (~3–5 %/100 m; AROME is documented to
+# underestimate high-elevation winter precipitation in the Pyrenees — Quéno et
+# al. 2016, Vionnet et al. 2016). Refit from XEMA peak/valley pairs with
+# `python -m minipirineu.opg fit` once a winter of gauge data is in the store.
+OPG_PER_100M = 0.03
+# Hard ceiling on the multiplicative factor: a runaway extrapolation far above
+# the saturation elevation would fabricate snow. 1.35 ≈ 1200 m above reference.
+OPG_MAX_FACTOR = 1.35
+
+# Saturation ("reference") elevation per forecast point and model: the height
+# above which that point's precipitation no longer responds to `elevation`.
+# MEASURED, not assumed — `scripts/detect_opg_saturation.py` over every
+# committed revision of data/openmeteo.json (docs/notes/opg.md). None = the
+# bands still resolve their own cells there, so no correction applies.
+# Cell selection is a geometry property of the grid, so these hold year-round
+# even though the runs that measured them are summer ones.
+OPG_REFERENCE_ELEVATION_M: dict[tuple[str, str], int | None] = {
+    ("baqueira", "meteofrance_arome_france"): 2000,
+    ("baqueira", "meteofrance_arome_france_hd"): 2000,
+    ("boi-taull", "meteofrance_arome_france"): None,
+    ("boi-taull", "meteofrance_arome_france_hd"): None,
+    ("la-molina", "meteofrance_arome_france"): None,
+    ("la-molina", "meteofrance_arome_france_hd"): 2100,
+}
+# The verification points (XEMA truth stations, T9/T11) are single-elevation
+# fetches, so their own saturation height cannot be detected from the archive
+# the way the three-band resort points can. Until `scripts/probe_opg_saturation.py`
+# measures them, each inherits its resort's value — an explicit, flagged prior
+# (opg.resolve_reference reports the inheritance), never a silent guess.
+OPG_PROBED_STATION_ELEVATION_M: dict[tuple[str, str], int | None] = {}
+
+# A 6 h bucket counts as "wet" for gate scoring and for gradient fitting at or
+# above this precipitation/snow amount: dry buckets carry no OPG signal and
+# would only dilute the metrics the go/no-go threshold is measured on.
+OPG_WET_BUCKET_MM = 0.5
+OPG_WET_BUCKET_CM = 0.5
+# ...and a pair of elevations is only comparable when at least this many of the
+# lower band's steps are non-zero. A total alone is not enough: two DIFFERENT
+# grid cells can serve an identical series through a light spell that is mostly
+# zeros, which is how a saturation verdict gets fabricated from a marginal
+# window (measured: every spurious "identical" run in the archive rested on 1–2
+# non-zero buckets, docs/notes/opg.md §1).
+OPG_MIN_WET_STEPS = 3
+# Go/no-go (ROADMAP §4 S1.3): cm MAE on the affected points must improve by at
+# least this fraction on backtest wet buckets, and the correction must not turn
+# the baseline's under-prediction into over-prediction (bias sign flip).
+OPG_GATE_MIN_MAE_GAIN = 0.10
+
+
 # --- Previous Runs backtest fetch (S0.6a/T9) --------------------------------
 #
 # Forecast side of the frozen baseline: fixed-lead AROME series from the
