@@ -1,6 +1,6 @@
 {
  "schema": "minipirineu/openmeteo/v1",
- "fetched_at": "2026-09-02T11:18:45+00:00",
+ "fetched_at": "2026-09-02T16:34:49+00:00",
  "timezone": "Europe/Madrid",
  "stations": [
   {
@@ -19,13 +19,6 @@
        "label": "AROME HD 1.3 km",
        "snowfall_source": "derived",
        "intervals": [
-        {
-         "start": "2026-09-02T12:00",
-         "end": "2026-09-02T18:00",
-         "snowfall_cm": 0.0,
-         "precipitation_mm": 0.0,
-         "temperature_c": 23.8
-        },
         {
          "start": "2026-09-02T18:00",
          "end": "2026-09-03T00:00",
@@ -78,20 +71,13 @@
        ],
        "total_snowfall_cm": 0.0,
        "total_precipitation_mm": 0.0,
-       "effective_horizon_h": 48
+       "effective_horizon_h": 42
       },
       {
        "model": "meteofrance_arome_france",
        "label": "AROME 2.5 km",
        "snowfall_source": "native",
        "intervals": [
-        {
-         "start": "2026-09-02T12:00",
-         "end": "2026-09-02T18:00",
-         "snowfall_cm": 0.0,
-         "precipitation_mm": 0.0,
-         "temperature_c": 23.4
-        },
         {
          "start": "2026-09-02T18:00",
          "end": "2026-09-03T00:00",
@@ -144,7 +130,7 @@
        ],
        "total_snowfall_cm": 0.0,
        "total_precipitation_mm": 0.0,
-       "effective_horizon_h": 48
+       "effective_horizon_h": 42
       }
      ]
     },
@@ -158,13 +144,6 @@
        "label": "AROME HD 1.3 km",
        "snowfall_source": "derived",
        "intervals": [
-        {
-         "start": "2026-09-02T12:00",
-         "end": "2026-09-02T18:00",
-         "snowfall_cm": 0.0,
-         "precipitation_mm": 0.0,
-         "temperature_c": 19.8
-        },
         {
          "start": "2026-09-02T18:00",
          "end": "2026-09-03T00:00",
@@ -217,20 +196,13 @@
        ],
        "total_snowfall_cm": 0.0,
        "total_precipitation_mm": 0.0,
-       "effective_horizon_h": 48
+       "effective_horizon_h": 42
       },
       {
        "model": "meteofrance_arome_france",
        "label": "AROME 2.5 km",
        "snowfall_source": "native",
        "intervals": [
-        {
-         "start": "2026-09-02T12:00",
-         "end": "2026-09-02T18:00",
-         "snowfall_cm": 0.0,
-         "precipitation_mm": 0.0,
-         "temperature_c": 19.3
-        },
         {
          "start": "2026-09-02T18:00",
          "end": "2026-09-03T00:00",
@@ -283,7 +255,7 @@
        ],
        "total_snowfall_cm": 0.0,
        "total_precipitation_mm": 0.0,
-       "effective_horizon_h": 48
+       "effective_horizon_h": 42
       }
      ]
     },
@@ -297,13 +269,6 @@
        "label": "AROME HD 1.3 km",
        "snowfall_source": "derived",
        "intervals": [
-        {
-         "start": "2026-09-02T12:00",
-         "end": "2026-09-02T18:00",
-         "snowfall_cm": 0.0,
-         "precipitation_mm": 0.0,
-         "temperature_c": 15.9
-        },
         {
          "start": "2026-09-02T18:00",
          "end": "2026-09-03T00:00",
@@ -356,20 +321,13 @@
        ],
        "total_snowfall_cm": 0.0,
        "total_precipitation_mm": 0.0,
-       "effective_horizon_h": 48
+       "effective_horizon_h": 42
       },
       {
        "model": "meteofrance_arome_france",
        "label": "AROME 2.5 km",
        "snowfall_source": "native",
        "intervals": [
-        {
-         "start": "2026-09-02T12:00",
-         "end": "2026-09-02T18:00",
-         "snowfall_cm": 0.0,
-         "precipitation_mm": 0.0,
-         "temperature_c": 15.4
-        },
         {
          "start": "2026-09-02T18:00",
          "end": "2026-09-03T00:00",
@@ -422,7 +380,7 @@
        ],
        "total_snowfall_cm": 0.0,
        "total_precipitation_mm": 0.0,
-       "effective_horizon_h": 48
+       "effective_horizon_h": 42
       }
      ]
     }
@@ -444,13 +402,6 @@
        "label": "AROME HD 1.3 km",
        "snowfall_source": "derived",
        "intervals": [
-        {
-         "start": "2026-09-02T12:00",
-         "end": "2026-09-02T18:00",
-         "snowfall_cm": 0.0,
-         "precipitation_mm": 0.0,
-         "temperature_c": 19.2
-        },
         {
          "start": "2026-09-02T18:00",
          "end": "2026-09-03T00:00",
@@ -503,20 +454,13 @@
        ],
        "total_snowfall_cm": 0.0,
        "total_precipitation_mm": 0.0,
-       "effective_horizon_h": 48
+       "effective_horizon_h": 42
       },
       {
        "model": "meteofrance_arome_france",
        "label": "AROME 2.5 km",
        "snowfall_source": "native",
        "intervals": [
-        {
-         "start": "2026-09-02T12:00",
-         "end": "2026-09-02T18:00",
-         "snowfall_cm": 0.0,
-         "precipitation_mm": 0.0,
-         "temperature_c": 19.8
-        },
         {
          "start": "2026-09-02T18:00",
          "end": "2026-09-03T00:00",
@@ -569,7 +513,7 @@
        ],
        "total_snowfall_cm": 0.0,
        "total_precipitation_mm": 0.0,
-       "effective_horizon_h": 48
+       "effective_horizon_h": 42
       }
      ]
     },
@@ -583,13 +527,6 @@
        "label": "AROME HD 1.3 km",
        "snowfall_source": "derived",
        "intervals": [
-        {
-         "start": "2026-09-02T12:00",
-         "end": "2026-09-02T18:00",
-         "snowfall_cm": 0.0,
-         "precipitation_mm": 0.0,
-         "temperature_c": 16.5
-        },
         {
          "start": "2026-09-02T18:00",
          "end": "2026-09-03T00:00",
@@ -642,20 +579,13 @@
        ],
        "total_snowfall_cm": 0.0,
        "total_precipitation_mm": 0.0,
-       "effective_horizon_h": 48
+       "effective_horizon_h": 42
       },
       {
        "model": "meteofrance_arome_france",
        "label": "AROME 2.5 km",
        "snowfall_source": "native",
        "intervals": [
-        {
-         "start": "2026-09-02T12:00",
-         "end": "2026-09-02T18:00",
-         "snowfall_cm": 0.0,
-         "precipitation_mm": 0.0,
-         "temperature_c": 16.9
-        },
         {
          "start": "2026-09-02T18:00",
          "end": "2026-09-03T00:00",
@@ -708,7 +638,7 @@
        ],
        "total_snowfall_cm": 0.0,
        "total_precipitation_mm": 0.0,
-       "effective_horizon_h": 48
+       "effective_horizon_h": 42
       }
      ]
     },
@@ -722,13 +652,6 @@
        "label": "AROME HD 1.3 km",
        "snowfall_source": "derived",
        "intervals": [
-        {
-         "start": "2026-09-02T12:00",
-         "end": "2026-09-02T18:00",
-         "snowfall_cm": 0.0,
-         "precipitation_mm": 0.0,
-         "temperature_c": 14.4
-        },
         {
          "start": "2026-09-02T18:00",
          "end": "2026-09-03T00:00",
@@ -781,20 +704,13 @@
        ],
        "total_snowfall_cm": 0.0,
        "total_precipitation_mm": 0.0,
-       "effective_horizon_h": 48
+       "effective_horizon_h": 42
       },
       {
        "model": "meteofrance_arome_france",
        "label": "AROME 2.5 km",
        "snowfall_source": "native",
        "intervals": [
-        {
-         "start": "2026-09-02T12:00",
-         "end": "2026-09-02T18:00",
-         "snowfall_cm": 0.0,
-         "precipitation_mm": 0.0,
-         "temperature_c": 14.2
-        },
         {
          "start": "2026-09-02T18:00",
          "end": "2026-09-03T00:00",
@@ -847,7 +763,7 @@
        ],
        "total_snowfall_cm": 0.0,
        "total_precipitation_mm": 0.0,
-       "effective_horizon_h": 48
+       "effective_horizon_h": 42
       }
      ]
     }
@@ -869,13 +785,6 @@
        "label": "AROME HD 1.3 km",
        "snowfall_source": "derived",
        "intervals": [
-        {
-         "start": "2026-09-02T12:00",
-         "end": "2026-09-02T18:00",
-         "snowfall_cm": 0.0,
-         "precipitation_mm": 0.0,
-         "temperature_c": 23.0
-        },
         {
          "start": "2026-09-02T18:00",
          "end": "2026-09-03T00:00",
@@ -928,20 +837,13 @@
        ],
        "total_snowfall_cm": 0.0,
        "total_precipitation_mm": 0.0,
-       "effective_horizon_h": 48
+       "effective_horizon_h": 42
       },
       {
        "model": "meteofrance_arome_france",
        "label": "AROME 2.5 km",
        "snowfall_source": "native",
        "intervals": [
-        {
-         "start": "2026-09-02T12:00",
-         "end": "2026-09-02T18:00",
-         "snowfall_cm": 0.0,
-         "precipitation_mm": 0.0,
-         "temperature_c": 23.3
-        },
         {
          "start": "2026-09-02T18:00",
          "end": "2026-09-03T00:00",
@@ -994,7 +896,7 @@
        ],
        "total_snowfall_cm": 0.0,
        "total_precipitation_mm": 0.0,
-       "effective_horizon_h": 48
+       "effective_horizon_h": 42
       }
      ]
     },
@@ -1008,13 +910,6 @@
        "label": "AROME HD 1.3 km",
        "snowfall_source": "derived",
        "intervals": [
-        {
-         "start": "2026-09-02T12:00",
-         "end": "2026-09-02T18:00",
-         "snowfall_cm": 0.0,
-         "precipitation_mm": 0.0,
-         "temperature_c": 20.3
-        },
         {
          "start": "2026-09-02T18:00",
          "end": "2026-09-03T00:00",
@@ -1067,20 +962,13 @@
        ],
        "total_snowfall_cm": 0.0,
        "total_precipitation_mm": 0.0,
-       "effective_horizon_h": 48
+       "effective_horizon_h": 42
       },
       {
        "model": "meteofrance_arome_france",
        "label": "AROME 2.5 km",
        "snowfall_source": "native",
        "intervals": [
-        {
-         "start": "2026-09-02T12:00",
-         "end": "2026-09-02T18:00",
-         "snowfall_cm": 0.0,
-         "precipitation_mm": 0.0,
-         "temperature_c": 19.3
-        },
         {
          "start": "2026-09-02T18:00",
          "end": "2026-09-03T00:00",
@@ -1133,7 +1021,7 @@
        ],
        "total_snowfall_cm": 0.0,
        "total_precipitation_mm": 0.0,
-       "effective_horizon_h": 48
+       "effective_horizon_h": 42
       }
      ]
     },
@@ -1147,13 +1035,6 @@
        "label": "AROME HD 1.3 km",
        "snowfall_source": "derived",
        "intervals": [
-        {
-         "start": "2026-09-02T12:00",
-         "end": "2026-09-02T18:00",
-         "snowfall_cm": 0.0,
-         "precipitation_mm": 0.0,
-         "temperature_c": 17.7
-        },
         {
          "start": "2026-09-02T18:00",
          "end": "2026-09-03T00:00",
@@ -1206,20 +1087,13 @@
        ],
        "total_snowfall_cm": 0.0,
        "total_precipitation_mm": 0.0,
-       "effective_horizon_h": 48
+       "effective_horizon_h": 42
       },
       {
        "model": "meteofrance_arome_france",
        "label": "AROME 2.5 km",
        "snowfall_source": "native",
        "intervals": [
-        {
-         "start": "2026-09-02T12:00",
-         "end": "2026-09-02T18:00",
-         "snowfall_cm": 0.0,
-         "precipitation_mm": 0.0,
-         "temperature_c": 16.4
-        },
         {
          "start": "2026-09-02T18:00",
          "end": "2026-09-03T00:00",
@@ -1272,7 +1146,7 @@
        ],
        "total_snowfall_cm": 0.0,
        "total_precipitation_mm": 0.0,
-       "effective_horizon_h": 48
+       "effective_horizon_h": 42
       }
      ]
     }
