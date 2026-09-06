@@ -1,6 +1,6 @@
 {
  "schema": "minipirineu/openmeteo/v1",
- "fetched_at": "2026-09-06T10:56:27+00:00",
+ "fetched_at": "2026-09-06T15:28:04+00:00",
  "timezone": "Europe/Madrid",
  "stations": [
   {
@@ -24,56 +24,56 @@
          "end": "2026-09-06T18:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 27.6
+         "temperature_c": 27.9
         },
         {
          "start": "2026-09-06T18:00",
          "end": "2026-09-07T00:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 22.4
+         "temperature_c": 22.6
         },
         {
          "start": "2026-09-07T00:00",
          "end": "2026-09-07T06:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 16.2
+         "temperature_c": 16.7
         },
         {
          "start": "2026-09-07T06:00",
          "end": "2026-09-07T12:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 19.0
+         "temperature_c": 19.1
         },
         {
          "start": "2026-09-07T12:00",
          "end": "2026-09-07T18:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 27.9
+         "temperature_c": 27.7
         },
         {
          "start": "2026-09-07T18:00",
          "end": "2026-09-08T00:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 22.8
+         "temperature_c": 22.2
         },
         {
          "start": "2026-09-08T00:00",
          "end": "2026-09-08T06:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 17.7
+         "temperature_c": 17.4
         },
         {
          "start": "2026-09-08T06:00",
          "end": "2026-09-08T12:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 16.9
+         "temperature_c": 19.3
         }
        ],
        "total_snowfall_cm": 0.0,
@@ -90,56 +90,56 @@
          "end": "2026-09-06T18:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 27.2
+         "temperature_c": 27.5
         },
         {
          "start": "2026-09-06T18:00",
          "end": "2026-09-07T00:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 21.9
+         "temperature_c": 22.1
         },
         {
          "start": "2026-09-07T00:00",
          "end": "2026-09-07T06:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 15.3
+         "temperature_c": 15.9
         },
         {
          "start": "2026-09-07T06:00",
          "end": "2026-09-07T12:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 18.2
+         "temperature_c": 18.3
         },
         {
          "start": "2026-09-07T12:00",
          "end": "2026-09-07T18:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 27.5
+         "temperature_c": 27.3
         },
         {
          "start": "2026-09-07T18:00",
          "end": "2026-09-08T00:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 22.3
+         "temperature_c": 21.7
         },
         {
          "start": "2026-09-08T00:00",
          "end": "2026-09-08T06:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 16.9
+         "temperature_c": 16.6
         },
         {
          "start": "2026-09-08T06:00",
          "end": "2026-09-08T12:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 16.0
+         "temperature_c": 18.5
         }
        ],
        "total_snowfall_cm": 0.0,
@@ -163,21 +163,21 @@
          "end": "2026-09-06T18:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 23.8
+         "temperature_c": 24.2
         },
         {
          "start": "2026-09-06T18:00",
          "end": "2026-09-07T00:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 18.8
+         "temperature_c": 18.7
         },
         {
          "start": "2026-09-07T00:00",
          "end": "2026-09-07T06:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 12.3
+         "temperature_c": 12.6
         },
         {
          "start": "2026-09-07T06:00",
@@ -191,28 +191,28 @@
          "end": "2026-09-07T18:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 24.1
+         "temperature_c": 23.9
         },
         {
          "start": "2026-09-07T18:00",
          "end": "2026-09-08T00:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 18.8
+         "temperature_c": 18.2
         },
         {
          "start": "2026-09-08T00:00",
          "end": "2026-09-08T06:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 14.0
+         "temperature_c": 13.7
         },
         {
          "start": "2026-09-08T06:00",
          "end": "2026-09-08T12:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 13.6
+         "temperature_c": 16.2
         }
        ],
        "total_snowfall_cm": 0.0,
@@ -229,56 +229,56 @@
          "end": "2026-09-06T18:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 22.6
+         "temperature_c": 23.0
         },
         {
          "start": "2026-09-06T18:00",
          "end": "2026-09-07T00:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 17.5
+         "temperature_c": 17.2
         },
         {
          "start": "2026-09-07T00:00",
          "end": "2026-09-07T06:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 10.6
+         "temperature_c": 10.9
         },
         {
          "start": "2026-09-07T06:00",
          "end": "2026-09-07T12:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 14.4
+         "temperature_c": 14.5
         },
         {
          "start": "2026-09-07T12:00",
          "end": "2026-09-07T18:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 22.9
+         "temperature_c": 22.7
         },
         {
          "start": "2026-09-07T18:00",
          "end": "2026-09-08T00:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 17.0
+         "temperature_c": 16.4
         },
         {
          "start": "2026-09-08T00:00",
          "end": "2026-09-08T06:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 12.0
+         "temperature_c": 11.6
         },
         {
          "start": "2026-09-08T06:00",
          "end": "2026-09-08T12:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 12.3
+         "temperature_c": 15.3
         }
        ],
        "total_snowfall_cm": 0.0,
@@ -302,7 +302,7 @@
          "end": "2026-09-06T18:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 19.9
+         "temperature_c": 20.3
         },
         {
          "start": "2026-09-06T18:00",
@@ -316,7 +316,7 @@
          "end": "2026-09-07T06:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 8.5
+         "temperature_c": 8.7
         },
         {
          "start": "2026-09-07T06:00",
@@ -330,28 +330,28 @@
          "end": "2026-09-07T18:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 20.2
+         "temperature_c": 20.0
         },
         {
          "start": "2026-09-07T18:00",
          "end": "2026-09-08T00:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 14.9
+         "temperature_c": 14.3
         },
         {
          "start": "2026-09-08T00:00",
          "end": "2026-09-08T06:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 10.1
+         "temperature_c": 9.8
         },
         {
          "start": "2026-09-08T06:00",
          "end": "2026-09-08T12:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 9.7
+         "temperature_c": 12.3
         }
        ],
        "total_snowfall_cm": 0.0,
@@ -368,21 +368,21 @@
          "end": "2026-09-06T18:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 18.7
+         "temperature_c": 19.1
         },
         {
          "start": "2026-09-06T18:00",
          "end": "2026-09-07T00:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 13.6
+         "temperature_c": 13.3
         },
         {
          "start": "2026-09-07T00:00",
          "end": "2026-09-07T06:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 6.7
+         "temperature_c": 7.0
         },
         {
          "start": "2026-09-07T06:00",
@@ -396,28 +396,28 @@
          "end": "2026-09-07T18:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 19.0
+         "temperature_c": 18.8
         },
         {
          "start": "2026-09-07T18:00",
          "end": "2026-09-08T00:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 13.1
+         "temperature_c": 12.5
         },
         {
          "start": "2026-09-08T00:00",
          "end": "2026-09-08T06:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 8.1
+         "temperature_c": 7.7
         },
         {
          "start": "2026-09-08T06:00",
          "end": "2026-09-08T12:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 8.4
+         "temperature_c": 11.5
         }
        ],
        "total_snowfall_cm": 0.0,
@@ -449,42 +449,42 @@
          "end": "2026-09-06T18:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 22.1
+         "temperature_c": 22.3
         },
         {
          "start": "2026-09-06T18:00",
          "end": "2026-09-07T00:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 18.0
+         "temperature_c": 17.9
         },
         {
          "start": "2026-09-07T00:00",
          "end": "2026-09-07T06:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 12.5
+         "temperature_c": 12.8
         },
         {
          "start": "2026-09-07T06:00",
          "end": "2026-09-07T12:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 15.1
+         "temperature_c": 15.0
         },
         {
          "start": "2026-09-07T12:00",
          "end": "2026-09-07T18:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 22.1
+         "temperature_c": 21.7
         },
         {
          "start": "2026-09-07T18:00",
          "end": "2026-09-08T00:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 18.0
+         "temperature_c": 17.7
         },
         {
          "start": "2026-09-08T00:00",
@@ -498,7 +498,7 @@
          "end": "2026-09-08T12:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 11.5
+         "temperature_c": 14.8
         }
        ],
        "total_snowfall_cm": 0.0,
@@ -515,56 +515,56 @@
          "end": "2026-09-06T18:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 22.6
+         "temperature_c": 22.8
         },
         {
          "start": "2026-09-06T18:00",
          "end": "2026-09-07T00:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 19.0
+         "temperature_c": 19.1
         },
         {
          "start": "2026-09-07T00:00",
          "end": "2026-09-07T06:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 14.6
+         "temperature_c": 14.7
         },
         {
          "start": "2026-09-07T06:00",
          "end": "2026-09-07T12:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 15.8
+         "temperature_c": 15.9
         },
         {
          "start": "2026-09-07T12:00",
          "end": "2026-09-07T18:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 22.6
+         "temperature_c": 22.2
         },
         {
          "start": "2026-09-07T18:00",
          "end": "2026-09-08T00:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 19.5
+         "temperature_c": 19.3
         },
         {
          "start": "2026-09-08T00:00",
          "end": "2026-09-08T06:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 14.5
+         "temperature_c": 14.4
         },
         {
          "start": "2026-09-08T06:00",
          "end": "2026-09-08T12:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 13.5
+         "temperature_c": 15.5
         }
        ],
        "total_snowfall_cm": 0.0,
@@ -588,7 +588,7 @@
          "end": "2026-09-06T18:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 19.3
+         "temperature_c": 19.6
         },
         {
          "start": "2026-09-06T18:00",
@@ -602,42 +602,42 @@
          "end": "2026-09-07T06:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 10.9
+         "temperature_c": 11.1
         },
         {
          "start": "2026-09-07T06:00",
          "end": "2026-09-07T12:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 13.0
+         "temperature_c": 12.9
         },
         {
          "start": "2026-09-07T12:00",
          "end": "2026-09-07T18:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 19.4
+         "temperature_c": 19.0
         },
         {
          "start": "2026-09-07T18:00",
          "end": "2026-09-08T00:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 15.9
+         "temperature_c": 15.7
         },
         {
          "start": "2026-09-08T00:00",
          "end": "2026-09-08T06:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 10.8
+         "temperature_c": 10.6
         },
         {
          "start": "2026-09-08T06:00",
          "end": "2026-09-08T12:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 10.1
+         "temperature_c": 12.8
         }
        ],
        "total_snowfall_cm": 0.0,
@@ -654,56 +654,56 @@
          "end": "2026-09-06T18:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 19.7
+         "temperature_c": 20.1
         },
         {
          "start": "2026-09-06T18:00",
          "end": "2026-09-07T00:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 16.6
+         "temperature_c": 16.8
         },
         {
          "start": "2026-09-07T00:00",
          "end": "2026-09-07T06:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 11.7
+         "temperature_c": 11.8
         },
         {
          "start": "2026-09-07T06:00",
          "end": "2026-09-07T12:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 12.6
+         "temperature_c": 12.8
         },
         {
          "start": "2026-09-07T12:00",
          "end": "2026-09-07T18:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 19.8
+         "temperature_c": 19.5
         },
         {
          "start": "2026-09-07T18:00",
          "end": "2026-09-08T00:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 16.9
+         "temperature_c": 16.7
         },
         {
          "start": "2026-09-08T00:00",
          "end": "2026-09-08T06:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 11.6
+         "temperature_c": 11.4
         },
         {
          "start": "2026-09-08T06:00",
          "end": "2026-09-08T12:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 10.9
+         "temperature_c": 12.6
         }
        ],
        "total_snowfall_cm": 0.0,
@@ -727,7 +727,7 @@
          "end": "2026-09-06T18:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 17.3
+         "temperature_c": 17.6
         },
         {
          "start": "2026-09-06T18:00",
@@ -741,7 +741,7 @@
          "end": "2026-09-07T06:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 8.8
+         "temperature_c": 9.1
         },
         {
          "start": "2026-09-07T06:00",
@@ -755,28 +755,28 @@
          "end": "2026-09-07T18:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 17.3
+         "temperature_c": 17.0
         },
         {
          "start": "2026-09-07T18:00",
          "end": "2026-09-08T00:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 13.6
+         "temperature_c": 13.5
         },
         {
          "start": "2026-09-08T00:00",
          "end": "2026-09-08T06:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 8.8
+         "temperature_c": 8.6
         },
         {
          "start": "2026-09-08T06:00",
          "end": "2026-09-08T12:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 8.0
+         "temperature_c": 10.9
         }
        ],
        "total_snowfall_cm": 0.0,
@@ -793,21 +793,21 @@
          "end": "2026-09-06T18:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 17.0
+         "temperature_c": 17.3
         },
         {
          "start": "2026-09-06T18:00",
          "end": "2026-09-07T00:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 13.9
+         "temperature_c": 14.0
         },
         {
          "start": "2026-09-07T00:00",
          "end": "2026-09-07T06:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 9.5
+         "temperature_c": 9.7
         },
         {
          "start": "2026-09-07T06:00",
@@ -821,28 +821,28 @@
          "end": "2026-09-07T18:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 17.0
+         "temperature_c": 16.7
         },
         {
          "start": "2026-09-07T18:00",
          "end": "2026-09-08T00:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 13.8
+         "temperature_c": 13.6
         },
         {
          "start": "2026-09-08T00:00",
          "end": "2026-09-08T06:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 9.3
+         "temperature_c": 9.1
         },
         {
          "start": "2026-09-08T06:00",
          "end": "2026-09-08T12:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 8.5
+         "temperature_c": 11.0
         }
        ],
        "total_snowfall_cm": 0.0,
@@ -874,35 +874,35 @@
          "end": "2026-09-06T18:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 26.5
+         "temperature_c": 26.6
         },
         {
          "start": "2026-09-06T18:00",
          "end": "2026-09-07T00:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 22.1
+         "temperature_c": 21.9
         },
         {
          "start": "2026-09-07T00:00",
          "end": "2026-09-07T06:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 16.2
+         "temperature_c": 16.1
         },
         {
          "start": "2026-09-07T06:00",
          "end": "2026-09-07T12:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 18.3
+         "temperature_c": 18.5
         },
         {
          "start": "2026-09-07T12:00",
          "end": "2026-09-07T18:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 25.6
+         "temperature_c": 25.3
         },
         {
          "start": "2026-09-07T18:00",
@@ -916,14 +916,14 @@
          "end": "2026-09-08T06:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 16.2
+         "temperature_c": 16.1
         },
         {
          "start": "2026-09-08T06:00",
          "end": "2026-09-08T12:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 15.8
+         "temperature_c": 18.2
         }
        ],
        "total_snowfall_cm": 0.0,
@@ -940,56 +940,56 @@
          "end": "2026-09-06T18:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 26.8
+         "temperature_c": 26.9
         },
         {
          "start": "2026-09-06T18:00",
          "end": "2026-09-07T00:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 23.1
+         "temperature_c": 22.6
         },
         {
          "start": "2026-09-07T00:00",
          "end": "2026-09-07T06:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 16.3
+         "temperature_c": 15.8
         },
         {
          "start": "2026-09-07T06:00",
          "end": "2026-09-07T12:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 17.4
+         "temperature_c": 18.1
         },
         {
          "start": "2026-09-07T12:00",
          "end": "2026-09-07T18:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 26.1
+         "temperature_c": 25.9
         },
         {
          "start": "2026-09-07T18:00",
          "end": "2026-09-08T00:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 21.8
+         "temperature_c": 21.7
         },
         {
          "start": "2026-09-08T00:00",
          "end": "2026-09-08T06:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 16.2
+         "temperature_c": 16.0
         },
         {
          "start": "2026-09-08T06:00",
          "end": "2026-09-08T12:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 16.0
+         "temperature_c": 18.0
         }
        ],
        "total_snowfall_cm": 0.0,
@@ -1013,21 +1013,21 @@
          "end": "2026-09-06T18:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 23.9
+         "temperature_c": 24.0
         },
         {
          "start": "2026-09-06T18:00",
          "end": "2026-09-07T00:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 19.7
+         "temperature_c": 19.5
         },
         {
          "start": "2026-09-07T00:00",
          "end": "2026-09-07T06:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 14.0
+         "temperature_c": 13.9
         },
         {
          "start": "2026-09-07T06:00",
@@ -1041,7 +1041,7 @@
          "end": "2026-09-07T18:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 22.8
+         "temperature_c": 22.6
         },
         {
          "start": "2026-09-07T18:00",
@@ -1055,14 +1055,14 @@
          "end": "2026-09-08T06:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 14.2
+         "temperature_c": 14.1
         },
         {
          "start": "2026-09-08T06:00",
          "end": "2026-09-08T12:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 14.0
+         "temperature_c": 15.9
         }
        ],
        "total_snowfall_cm": 0.0,
@@ -1086,14 +1086,14 @@
          "end": "2026-09-07T00:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 18.5
+         "temperature_c": 18.6
         },
         {
          "start": "2026-09-07T00:00",
          "end": "2026-09-07T06:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 13.7
+         "temperature_c": 13.5
         },
         {
          "start": "2026-09-07T06:00",
@@ -1107,28 +1107,28 @@
          "end": "2026-09-07T18:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 22.0
+         "temperature_c": 21.7
         },
         {
          "start": "2026-09-07T18:00",
          "end": "2026-09-08T00:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 17.5
+         "temperature_c": 17.4
         },
         {
          "start": "2026-09-08T00:00",
          "end": "2026-09-08T06:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 13.2
+         "temperature_c": 13.1
         },
         {
          "start": "2026-09-08T06:00",
          "end": "2026-09-08T12:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 12.8
+         "temperature_c": 15.8
         }
        ],
        "total_snowfall_cm": 0.0,
@@ -1152,21 +1152,21 @@
          "end": "2026-09-06T18:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 21.3
+         "temperature_c": 21.4
         },
         {
          "start": "2026-09-06T18:00",
          "end": "2026-09-07T00:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 17.1
+         "temperature_c": 16.9
         },
         {
          "start": "2026-09-07T00:00",
          "end": "2026-09-07T06:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 11.4
+         "temperature_c": 11.3
         },
         {
          "start": "2026-09-07T06:00",
@@ -1180,7 +1180,7 @@
          "end": "2026-09-07T18:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 20.2
+         "temperature_c": 19.9
         },
         {
          "start": "2026-09-07T18:00",
@@ -1194,14 +1194,14 @@
          "end": "2026-09-08T06:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 11.6
+         "temperature_c": 11.5
         },
         {
          "start": "2026-09-08T06:00",
          "end": "2026-09-08T12:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 11.4
+         "temperature_c": 13.3
         }
        ],
        "total_snowfall_cm": 0.0,
@@ -1218,56 +1218,56 @@
          "end": "2026-09-06T18:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 20.6
+         "temperature_c": 20.7
         },
         {
          "start": "2026-09-06T18:00",
          "end": "2026-09-07T00:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 15.8
+         "temperature_c": 15.7
         },
         {
          "start": "2026-09-07T00:00",
          "end": "2026-09-07T06:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 10.7
+         "temperature_c": 10.5
         },
         {
          "start": "2026-09-07T06:00",
          "end": "2026-09-07T12:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 12.3
+         "temperature_c": 12.1
         },
         {
          "start": "2026-09-07T12:00",
          "end": "2026-09-07T18:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 18.9
+         "temperature_c": 18.7
         },
         {
          "start": "2026-09-07T18:00",
          "end": "2026-09-08T00:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 14.6
+         "temperature_c": 14.5
         },
         {
          "start": "2026-09-08T00:00",
          "end": "2026-09-08T06:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 9.9
+         "temperature_c": 9.8
         },
         {
          "start": "2026-09-08T06:00",
          "end": "2026-09-08T12:00",
          "snowfall_cm": 0.0,
          "precipitation_mm": 0.0,
-         "temperature_c": 9.2
+         "temperature_c": 12.1
         }
        ],
        "total_snowfall_cm": 0.0,
