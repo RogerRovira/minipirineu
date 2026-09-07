@@ -1,6 +1,6 @@
 {
  "schema": "minipirineu/meteocat/v1",
- "fetched_at": "2026-09-06T16:24:57+00:00",
+ "fetched_at": "2026-09-07T18:22:29+00:00",
  "zones": [
   {
    "zone_id": 1,
@@ -9,37 +9,6 @@
     "Baqueira"
    ],
    "days": [
-    {
-     "date": "2026-09-06",
-     "blocks": [
-      {
-       "start": 0,
-       "cel": 1,
-       "probabilitat": 1,
-       "cota_m": null
-      },
-      {
-       "start": 6,
-       "cel": 2,
-       "probabilitat": 1,
-       "cota_m": null
-      },
-      {
-       "start": 12,
-       "cel": 2,
-       "probabilitat": 1,
-       "cota_m": null
-      },
-      {
-       "start": 18,
-       "cel": 3,
-       "probabilitat": 1,
-       "cota_m": null
-      }
-     ],
-     "acumulacio": null,
-     "acumulacio_neu": null
-    },
     {
      "date": "2026-09-07",
      "blocks": [
@@ -69,6 +38,37 @@
       }
      ],
      "acumulacio": null,
+     "acumulacio_neu": null
+    },
+    {
+     "date": "2026-09-08",
+     "blocks": [
+      {
+       "start": 0,
+       "cel": 1,
+       "probabilitat": 1,
+       "cota_m": null
+      },
+      {
+       "start": 6,
+       "cel": 3,
+       "probabilitat": 1,
+       "cota_m": null
+      },
+      {
+       "start": 12,
+       "cel": 20,
+       "probabilitat": 2,
+       "cota_m": null
+      },
+      {
+       "start": 18,
+       "cel": 32,
+       "probabilitat": 5,
+       "cota_m": null
+      }
+     ],
+     "acumulacio": 3,
      "acumulacio_neu": null
     }
    ]
@@ -81,11 +81,11 @@
    ],
    "days": [
     {
-     "date": "2026-09-06",
+     "date": "2026-09-07",
      "blocks": [
       {
        "start": 0,
-       "cel": 1,
+       "cel": 2,
        "probabilitat": 1,
        "cota_m": null
       },
@@ -97,13 +97,13 @@
       },
       {
        "start": 12,
-       "cel": 2,
+       "cel": 3,
        "probabilitat": 1,
        "cota_m": null
       },
       {
        "start": 18,
-       "cel": 3,
+       "cel": 1,
        "probabilitat": 1,
        "cota_m": null
       }
@@ -112,7 +112,7 @@
      "acumulacio_neu": null
     },
     {
-     "date": "2026-09-07",
+     "date": "2026-09-08",
      "blocks": [
       {
        "start": 0,
@@ -122,24 +122,24 @@
       },
       {
        "start": 6,
-       "cel": 2,
+       "cel": 1,
        "probabilitat": 1,
        "cota_m": null
       },
       {
        "start": 12,
-       "cel": 3,
-       "probabilitat": 1,
+       "cel": 20,
+       "probabilitat": 2,
        "cota_m": null
       },
       {
        "start": 18,
-       "cel": 1,
-       "probabilitat": 1,
+       "cel": 32,
+       "probabilitat": 4,
        "cota_m": null
       }
      ],
-     "acumulacio": null,
+     "acumulacio": 2,
      "acumulacio_neu": null
     }
    ]
@@ -152,7 +152,7 @@
    ],
    "days": [
     {
-     "date": "2026-09-06",
+     "date": "2026-09-07",
      "blocks": [
       {
        "start": 0,
@@ -174,7 +174,7 @@
       },
       {
        "start": 18,
-       "cel": 3,
+       "cel": 1,
        "probabilitat": 1,
        "cota_m": null
       }
@@ -183,34 +183,34 @@
      "acumulacio_neu": null
     },
     {
-     "date": "2026-09-07",
+     "date": "2026-09-08",
      "blocks": [
       {
        "start": 0,
-       "cel": 2,
+       "cel": 1,
        "probabilitat": 1,
        "cota_m": null
       },
       {
        "start": 6,
-       "cel": 2,
+       "cel": 1,
        "probabilitat": 1,
        "cota_m": null
       },
       {
        "start": 12,
-       "cel": 1,
+       "cel": 3,
        "probabilitat": 1,
        "cota_m": null
       },
       {
        "start": 18,
-       "cel": 1,
-       "probabilitat": 1,
+       "cel": 24,
+       "probabilitat": 3,
        "cota_m": null
       }
      ],
-     "acumulacio": null,
+     "acumulacio": 3,
      "acumulacio_neu": null
     }
    ]
