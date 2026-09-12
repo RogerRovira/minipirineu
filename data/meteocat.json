@@ -1,6 +1,6 @@
 {
  "schema": "minipirineu/meteocat/v1",
- "fetched_at": "2026-09-11T17:10:35+00:00",
+ "fetched_at": "2026-09-12T16:28:11+00:00",
  "zones": [
   {
    "zone_id": 1,
@@ -10,7 +10,7 @@
    ],
    "days": [
     {
-     "date": "2026-09-11",
+     "date": "2026-09-12",
      "blocks": [
       {
        "start": 0,
@@ -20,7 +20,7 @@
       },
       {
        "start": 6,
-       "cel": 3,
+       "cel": 1,
        "probabilitat": 1,
        "cota_m": null
       },
@@ -32,7 +32,7 @@
       },
       {
        "start": 18,
-       "cel": 3,
+       "cel": 1,
        "probabilitat": 1,
        "cota_m": null
       }
@@ -41,7 +41,7 @@
      "acumulacio_neu": null
     },
     {
-     "date": "2026-09-12",
+     "date": "2026-09-13",
      "blocks": [
       {
        "start": 0,
@@ -81,37 +81,6 @@
    ],
    "days": [
     {
-     "date": "2026-09-11",
-     "blocks": [
-      {
-       "start": 0,
-       "cel": 1,
-       "probabilitat": 1,
-       "cota_m": null
-      },
-      {
-       "start": 6,
-       "cel": 1,
-       "probabilitat": 1,
-       "cota_m": null
-      },
-      {
-       "start": 12,
-       "cel": 1,
-       "probabilitat": 1,
-       "cota_m": null
-      },
-      {
-       "start": 18,
-       "cel": 1,
-       "probabilitat": 1,
-       "cota_m": null
-      }
-     ],
-     "acumulacio": null,
-     "acumulacio_neu": null
-    },
-    {
      "date": "2026-09-12",
      "blocks": [
       {
@@ -129,6 +98,37 @@
       {
        "start": 12,
        "cel": 3,
+       "probabilitat": 1,
+       "cota_m": null
+      },
+      {
+       "start": 18,
+       "cel": 1,
+       "probabilitat": 1,
+       "cota_m": null
+      }
+     ],
+     "acumulacio": null,
+     "acumulacio_neu": null
+    },
+    {
+     "date": "2026-09-13",
+     "blocks": [
+      {
+       "start": 0,
+       "cel": 1,
+       "probabilitat": 1,
+       "cota_m": null
+      },
+      {
+       "start": 6,
+       "cel": 1,
+       "probabilitat": 1,
+       "cota_m": null
+      },
+      {
+       "start": 12,
+       "cel": 1,
        "probabilitat": 1,
        "cota_m": null
       },
@@ -152,7 +152,7 @@
    ],
    "days": [
     {
-     "date": "2026-09-11",
+     "date": "2026-09-12",
      "blocks": [
       {
        "start": 0,
@@ -168,7 +168,7 @@
       },
       {
        "start": 12,
-       "cel": 1,
+       "cel": 3,
        "probabilitat": 1,
        "cota_m": null
       },
@@ -183,7 +183,7 @@
      "acumulacio_neu": null
     },
     {
-     "date": "2026-09-12",
+     "date": "2026-09-13",
      "blocks": [
       {
        "start": 0,
