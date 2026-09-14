@@ -1,6 +1,6 @@
 {
  "schema": "minipirineu/meteocat/v1",
- "fetched_at": "2026-09-13T17:02:49+00:00",
+ "fetched_at": "2026-09-14T18:51:08+00:00",
  "zones": [
   {
    "zone_id": 1,
@@ -10,7 +10,7 @@
    ],
    "days": [
     {
-     "date": "2026-09-13",
+     "date": "2026-09-14",
      "blocks": [
       {
        "start": 0,
@@ -41,7 +41,7 @@
      "acumulacio_neu": null
     },
     {
-     "date": "2026-09-14",
+     "date": "2026-09-15",
      "blocks": [
       {
        "start": 0,
@@ -81,7 +81,7 @@
    ],
    "days": [
     {
-     "date": "2026-09-13",
+     "date": "2026-09-14",
      "blocks": [
       {
        "start": 0,
@@ -112,7 +112,7 @@
      "acumulacio_neu": null
     },
     {
-     "date": "2026-09-14",
+     "date": "2026-09-15",
      "blocks": [
       {
        "start": 0,
@@ -128,7 +128,7 @@
       },
       {
        "start": 12,
-       "cel": 1,
+       "cel": 3,
        "probabilitat": 1,
        "cota_m": null
       },
@@ -152,7 +152,7 @@
    ],
    "days": [
     {
-     "date": "2026-09-13",
+     "date": "2026-09-14",
      "blocks": [
       {
        "start": 0,
@@ -168,13 +168,13 @@
       },
       {
        "start": 12,
-       "cel": 3,
+       "cel": 1,
        "probabilitat": 1,
        "cota_m": null
       },
       {
        "start": 18,
-       "cel": 3,
+       "cel": 1,
        "probabilitat": 1,
        "cota_m": null
       }
@@ -183,7 +183,7 @@
      "acumulacio_neu": null
     },
     {
-     "date": "2026-09-14",
+     "date": "2026-09-15",
      "blocks": [
       {
        "start": 0,
