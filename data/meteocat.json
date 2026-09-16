@@ -1,6 +1,6 @@
 {
  "schema": "minipirineu/meteocat/v1",
- "fetched_at": "2026-09-15T17:45:25+00:00",
+ "fetched_at": "2026-09-16T17:43:58+00:00",
  "zones": [
   {
    "zone_id": 1,
@@ -9,37 +9,6 @@
     "Baqueira"
    ],
    "days": [
-    {
-     "date": "2026-09-15",
-     "blocks": [
-      {
-       "start": 0,
-       "cel": 1,
-       "probabilitat": 1,
-       "cota_m": null
-      },
-      {
-       "start": 6,
-       "cel": 1,
-       "probabilitat": 1,
-       "cota_m": null
-      },
-      {
-       "start": 12,
-       "cel": 1,
-       "probabilitat": 1,
-       "cota_m": null
-      },
-      {
-       "start": 18,
-       "cel": 1,
-       "probabilitat": 1,
-       "cota_m": null
-      }
-     ],
-     "acumulacio": null,
-     "acumulacio_neu": null
-    },
     {
      "date": "2026-09-16",
      "blocks": [
@@ -70,6 +39,37 @@
      ],
      "acumulacio": 3,
      "acumulacio_neu": 1
+    },
+    {
+     "date": "2026-09-17",
+     "blocks": [
+      {
+       "start": 0,
+       "cel": 20,
+       "probabilitat": 1,
+       "cota_m": null
+      },
+      {
+       "start": 6,
+       "cel": 3,
+       "probabilitat": 1,
+       "cota_m": null
+      },
+      {
+       "start": 12,
+       "cel": 3,
+       "probabilitat": 3,
+       "cota_m": null
+      },
+      {
+       "start": 18,
+       "cel": 20,
+       "probabilitat": 1,
+       "cota_m": null
+      }
+     ],
+     "acumulacio": 2,
+     "acumulacio_neu": null
     }
    ]
   },
@@ -80,37 +80,6 @@
     "Boí Taüll"
    ],
    "days": [
-    {
-     "date": "2026-09-15",
-     "blocks": [
-      {
-       "start": 0,
-       "cel": 1,
-       "probabilitat": 1,
-       "cota_m": null
-      },
-      {
-       "start": 6,
-       "cel": 1,
-       "probabilitat": 1,
-       "cota_m": null
-      },
-      {
-       "start": 12,
-       "cel": 3,
-       "probabilitat": 1,
-       "cota_m": null
-      },
-      {
-       "start": 18,
-       "cel": 1,
-       "probabilitat": 1,
-       "cota_m": null
-      }
-     ],
-     "acumulacio": null,
-     "acumulacio_neu": null
-    },
     {
      "date": "2026-09-16",
      "blocks": [
@@ -141,6 +110,37 @@
      ],
      "acumulacio": 3,
      "acumulacio_neu": 1
+    },
+    {
+     "date": "2026-09-17",
+     "blocks": [
+      {
+       "start": 0,
+       "cel": 4,
+       "probabilitat": 1,
+       "cota_m": null
+      },
+      {
+       "start": 6,
+       "cel": 3,
+       "probabilitat": 1,
+       "cota_m": null
+      },
+      {
+       "start": 12,
+       "cel": 31,
+       "probabilitat": 4,
+       "cota_m": null
+      },
+      {
+       "start": 18,
+       "cel": 20,
+       "probabilitat": 1,
+       "cota_m": null
+      }
+     ],
+     "acumulacio": 2,
+     "acumulacio_neu": null
     }
    ]
   },
@@ -151,37 +151,6 @@
     "La Molina"
    ],
    "days": [
-    {
-     "date": "2026-09-15",
-     "blocks": [
-      {
-       "start": 0,
-       "cel": 1,
-       "probabilitat": 1,
-       "cota_m": null
-      },
-      {
-       "start": 6,
-       "cel": 1,
-       "probabilitat": 1,
-       "cota_m": null
-      },
-      {
-       "start": 12,
-       "cel": 1,
-       "probabilitat": 1,
-       "cota_m": null
-      },
-      {
-       "start": 18,
-       "cel": 1,
-       "probabilitat": 1,
-       "cota_m": null
-      }
-     ],
-     "acumulacio": null,
-     "acumulacio_neu": null
-    },
     {
      "date": "2026-09-16",
      "blocks": [
@@ -211,6 +180,37 @@
       }
      ],
      "acumulacio": 4,
+     "acumulacio_neu": null
+    },
+    {
+     "date": "2026-09-17",
+     "blocks": [
+      {
+       "start": 0,
+       "cel": 20,
+       "probabilitat": 1,
+       "cota_m": null
+      },
+      {
+       "start": 6,
+       "cel": 3,
+       "probabilitat": 1,
+       "cota_m": null
+      },
+      {
+       "start": 12,
+       "cel": 20,
+       "probabilitat": 2,
+       "cota_m": null
+      },
+      {
+       "start": 18,
+       "cel": 20,
+       "probabilitat": 1,
+       "cota_m": null
+      }
+     ],
+     "acumulacio": 2,
      "acumulacio_neu": null
     }
    ]
