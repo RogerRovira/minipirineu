@@ -1,6 +1,6 @@
 {
  "schema": "minipirineu/meteocat/v1",
- "fetched_at": "2026-09-22T17:44:40+00:00",
+ "fetched_at": "2026-09-23T17:57:12+00:00",
  "zones": [
   {
    "zone_id": 1,
@@ -10,7 +10,7 @@
    ],
    "days": [
     {
-     "date": "2026-09-22",
+     "date": "2026-09-23",
      "blocks": [
       {
        "start": 0,
@@ -41,11 +41,11 @@
      "acumulacio_neu": null
     },
     {
-     "date": "2026-09-23",
+     "date": "2026-09-24",
      "blocks": [
       {
        "start": 0,
-       "cel": 1,
+       "cel": 2,
        "probabilitat": 1,
        "cota_m": null
       },
@@ -57,13 +57,13 @@
       },
       {
        "start": 12,
-       "cel": 1,
+       "cel": 2,
        "probabilitat": 1,
        "cota_m": null
       },
       {
        "start": 18,
-       "cel": 2,
+       "cel": 1,
        "probabilitat": 1,
        "cota_m": null
       }
@@ -81,37 +81,6 @@
    ],
    "days": [
     {
-     "date": "2026-09-22",
-     "blocks": [
-      {
-       "start": 0,
-       "cel": 1,
-       "probabilitat": 1,
-       "cota_m": null
-      },
-      {
-       "start": 6,
-       "cel": 1,
-       "probabilitat": 1,
-       "cota_m": null
-      },
-      {
-       "start": 12,
-       "cel": 1,
-       "probabilitat": 1,
-       "cota_m": null
-      },
-      {
-       "start": 18,
-       "cel": 1,
-       "probabilitat": 1,
-       "cota_m": null
-      }
-     ],
-     "acumulacio": null,
-     "acumulacio_neu": null
-    },
-    {
      "date": "2026-09-23",
      "blocks": [
       {
@@ -134,29 +103,20 @@
       },
       {
        "start": 18,
-       "cel": 2,
+       "cel": 1,
        "probabilitat": 1,
        "cota_m": null
       }
      ],
      "acumulacio": null,
      "acumulacio_neu": null
-    }
-   ]
-  },
-  {
-   "zone_id": 6,
-   "zone_name": "Prepirineu oriental",
-   "stations": [
-    "La Molina"
-   ],
-   "days": [
+    },
     {
-     "date": "2026-09-22",
+     "date": "2026-09-24",
      "blocks": [
       {
        "start": 0,
-       "cel": 2,
+       "cel": 1,
        "probabilitat": 1,
        "cota_m": null
       },
@@ -181,7 +141,16 @@
      ],
      "acumulacio": null,
      "acumulacio_neu": null
-    },
+    }
+   ]
+  },
+  {
+   "zone_id": 6,
+   "zone_name": "Prepirineu oriental",
+   "stations": [
+    "La Molina"
+   ],
+   "days": [
     {
      "date": "2026-09-23",
      "blocks": [
@@ -206,6 +175,37 @@
       {
        "start": 18,
        "cel": 1,
+       "probabilitat": 1,
+       "cota_m": null
+      }
+     ],
+     "acumulacio": null,
+     "acumulacio_neu": null
+    },
+    {
+     "date": "2026-09-24",
+     "blocks": [
+      {
+       "start": 0,
+       "cel": 2,
+       "probabilitat": 1,
+       "cota_m": null
+      },
+      {
+       "start": 6,
+       "cel": 2,
+       "probabilitat": 1,
+       "cota_m": null
+      },
+      {
+       "start": 12,
+       "cel": 2,
+       "probabilitat": 1,
+       "cota_m": null
+      },
+      {
+       "start": 18,
+       "cel": 2,
        "probabilitat": 1,
        "cota_m": null
       }
